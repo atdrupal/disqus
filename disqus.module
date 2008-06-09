@@ -46,3 +46,43 @@ function disqus_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
     break;
   }
 }
+
+
+/**
+ * Implementation of hook_link().
+ */
+function disqus_link($type, $node = NULL, $teaser = FALSE) {
+  $links = array();
+  if ($type == 'node' && $teaser == TRUE) {
+    $types = variable_get('disqus_nodetypes', array());
+    if (!empty($types[$node->type]) && user_access('view disqus comments')) {
+      $links['disqus_comments'] = array(
+        'title' => t('Comments'),
+        'href' => "node/$node->nid",
+        'attributes' => array('title' => t('Jump to the comments of this posting.')),
+        'fragment' => 'disqus_thread',
+      );
+      static $disqus_js_added = FALSE;
+      if ($disqus_js_added === FALSE) {
+        $disqus_js_added = TRUE;
+        $domain = variable_get('disqus_domain', '');
+        $disqus_js = <<<EOT
+//<[CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+      if(links[i].href.indexOf('#disqus_thread') >= 0) {
+        query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&';
+      }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/$domain/get_num_replies.js' + query + '"></' + 'script>');
+  })();
+//]]>
+EOT;
+        drupal_add_js($disqus_js, 'inline', 'footer');
+      }
+    }
+  }
+  return $links;
+}

@@ -21,6 +21,7 @@ function disqus_menu() {
     'access arguments' => array('administer disqus'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('disqus_admin_settings'),
+    'file' => 'disqus.admin.inc'
   );
   return $items;
 }

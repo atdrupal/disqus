@@ -1,0 +1,66 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_perm().
+ */
+function disqus_perm() {
+  return array(
+    'administer disqus',
+    'view disqus comments',
+  );
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function disqus_menu() {
+  $items = array();
+  $items['admin/settings/disqus'] = array(
+    'title' => 'Disqus',
+    'access arguments' => array('administer disqus'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('disqus_admin_settings'),
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function disqus_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  switch ($op) {
+    case 'view':
+      $types = variable_get('disqus_nodetypes', array());
+      if (!empty($types[$node->type]) && user_access('view disqus comments')) {
+        $domain = variable_get('disqus_domain', '');
+        $disqus = "<div id=\"disqus_thread\"></div><script type=\"text/javascript\" src=\"http://disqus.com/forums/$domain/embed.js\"></script><noscript><a href=\"http://$domain.disqus.com/?url=ref\">View the forum thread.</a></noscript>";
+        $node->content['disqus'] = array(
+          '#value' => $disqus,
+          '#weight' => 10,
+        );
+      }
+    break;
+  }
+}
+
+/**
+ * Menu callback; Displays the administration settings for Disqus.
+ */
+function disqus_admin_settings() {
+  $form = array();
+  $form['disqus_domain'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Domain'),
+    '#description' => t('The domain you registered Disqus with. If you registered http://example.disqus.com, you would enter "example" here.'),
+    '#default_value' => variable_get('disqus_domain', ''),
+  );
+  $form['disqus_nodetypes'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Node Types'),
+    '#description' => t('Apply comments to only the following node types.'),
+    '#default_value' => variable_get('disqus_nodetypes', array()),
+    '#options' => node_get_types('names'),
+  );
+  return system_settings_form($form);
+}

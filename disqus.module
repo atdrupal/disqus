@@ -44,7 +44,7 @@ function disqus_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
             $message = nl2br($node->teaser);
             $message = str_replace("\r", ' ', $message);
             $message = str_replace("\n", ' ', $message);
-            $message = strip_tags($message, '<a>');
+            $message = strip_tags($message);
             $message = check_plain($message);
 
             // Build the title

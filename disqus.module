@@ -51,7 +51,8 @@ function disqus_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
             $title = check_plain($node->title);
 
             // Inject the script
-            $disqus = "<script type=\"text/javascript\">var disqus_title = \"$title\";var disqus_message = \"$message\";</script><div id=\"disqus_thread\"></div><script type=\"text/javascript\" src=\"http://disqus.com/forums/$domain/embed.js\"></script><noscript><a href=\"http://$domain.disqus.com/?url=ref\">View the forum thread.</a></noscript>";
+            $disqus_developer = variable_get('disqus_developer', FALSE) ? 'var disqus_developer = 1;' : '';
+            $disqus = "<script type=\"text/javascript\">var disqus_title = \"$title\";var disqus_message = \"$message\";$disqus_developer</script><div id=\"disqus_thread\"></div><script type=\"text/javascript\" src=\"http://disqus.com/forums/$domain/embed.js\"></script><noscript><a href=\"http://$domain.disqus.com/?url=ref\">View the forum thread.</a></noscript>";
             $node->content['disqus'] = array(
               '#value' => $disqus,
               '#weight' => 10,

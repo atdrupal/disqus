@@ -19,5 +19,11 @@ function disqus_admin_settings() {
     '#default_value' => variable_get('disqus_nodetypes', array()),
     '#options' => node_get_types('names'),
   );
+  $form['disqus_developer'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Testing'),
+    '#description' => t('When enabled, uses the <a href="http://disqus.com/help/#faq-14">disqus_developer</a> flag to tell Disqus that you are in a testing environment. Threads will not display on the public community page with this set.'),
+    '#default_value' => variable_get('disqus_developer', FALSE),
+  );
   return system_settings_form($form);
 }

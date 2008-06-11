@@ -102,3 +102,116 @@ EOT;
   }
   return $links;
 }
+
+/**
+ * Implementation of hook_block().
+ */
+function disqus_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+  case 'list':
+    return array(
+      'disqus_recent_comments' => array('info' => t('Disqus Recent Comments'), 'cache' => BLOCK_CACHE_GLOBAL),
+      'disqus_popular_threads' => array('info' => t('Disqus Popular Threads'), 'cache' => BLOCK_CACHE_GLOBAL),
+      'disqus_top_commenters' => array('info' => t('Disqus Top Commenters'), 'cache' => BLOCK_CACHE_GLOBAL),
+      'disqus_combination_widget' => array('info' => t('Disqus Combination Widget'), 'cache' => BLOCK_CACHE_GLOBAL),
+    );
+  case 'configure':
+    $form = array();
+    $form[$delta .'_items'] = array(
+      '#type' => 'select',
+      '#title' => t('Number of items to show'),
+      '#options' => array(1 => 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+      '#default_value' => variable_get($delta .'_items', 5),
+    );
+    $form[$delta .'_showavatars'] = array(
+      '#type' => 'select',
+      '#title' => t('Show avatars'),
+      '#options' => array(FALSE => t('No'), TRUE => t('Yes')),
+      '#default_value' => variable_get($delta .'_showavatars', TRUE),
+      '#access' => ($delta == 'disqus_recent_comments') || ($delta == 'disqus_top_commenters'),
+    );
+    $form[$delta .'_avatarsize'] = array(
+      '#type' => 'select',
+      '#title' => t('Avatar size'),
+      '#options' => array(
+        24 => t('X-Small (24px)'),
+        32 => t('Small (32px)'),
+        48 => t('Medium (48px)'),
+        92 => t('Large (92px)'),
+        128 => t('X-Large (128px)'),
+      ),
+      '#default_value' => variable_get($delta .'_avatarsize', 32),
+      '#access' => $form[$delta .'_showavatars']['#access'],
+    );
+    $form[$delta .'_colortheme'] = array(
+      '#type' => 'select',
+      '#title' => t('Color Theme'),
+      '#options' => array(
+        'blue' => t('Blue'),
+        'grey' => t('Grey'),
+        'green' => t('Green'),
+        'red' => t('Red'),
+        'orange' => t('Orange'),
+      ),
+      '#default_value' => variable_get($delta .'_colortheme', 'blue'),
+      '#access' => $delta == 'disqus_combination_widget'
+    );
+    $form[$delta .'_defaulttabview'] = array(
+      '#type' => 'select',
+      '#title' => t('Default Tab View'),
+      '#options' => array(
+        'people' => t('People'),
+        'recent' => t('Recent'),
+        'popular' => t('Popular'),
+      ),
+      '#default_value' => variable_get($delta .'_defaulttabview', 'people'),
+      '#access' => $delta == 'disqus_combination_widget'
+    );
+    return $form;
+  case 'save':
+    variable_set($delta .'_items', $edit[$delta .'_items']);
+    variable_set($delta .'_showavatars', $edit[$delta .'_showavatars']);
+    variable_set($delta .'_avatarsize', $edit[$delta .'_avatarsize']);
+    variable_set($delta .'_colortheme', $edit[$delta .'_colortheme']);
+    variable_set($delta .'_defaulttabview', $edit[$delta .'_defaulttabview']);
+  break;
+  case 'view':
+    $num_items = variable_get($delta .'_items', 5);
+    $avatars = variable_get($delta .'_showavatars', TRUE) ? '&avatar_size='. variable_get($delta .'_avatarsize', 32) : '&hide_avatars=1';
+    $color = variable_get($delta .'_colortheme', 'blue');
+    $default_tab = variable_get($delta .'_defaulttabview', 'people');
+    $domain = variable_get('disqus_domain', '');
+    if (!empty($domain)) {
+      $subject = '';
+      $content = '';
+      switch ($delta) {
+      case 'disqus_recent_comments':
+        $content = <<<EOT
+<div id="dsq-recentcomments" class="dsq-widget"><script type="text/javascript" src="http://disqus.com/forums/$domain/recent_comments_widget.js?num_items=$num_items$avatars"></script></div>
+EOT;
+        $subject = t('Recent Comments');
+      break;
+      case 'disqus_popular_threads':
+        $subject = t('Popular Threads');
+        $content = <<<EOT
+<div id="dsq-popthreads" class="dsq-widget"><script type="text/javascript" src="http://disqus.com/forums/$domain/popular_threads_widget.js?num_items=$num_items"></script></div>
+EOT;
+      break;
+      case 'disqus_top_commenters':
+        $subject = t('Top Commenters');
+        $content = <<<EOT
+<div id="dsq-topcommenters" class="dsq-widget"><script type="text/javascript" src="http://disqus.com/forums/$domain/top_commenters_widget.js?num_items=$num_items$avatars"></script></div>
+EOT;
+      break;
+      case 'disqus_combination_widget':
+        $subject = t('Comments');
+        $content = <<<EOT
+<script type="text/javascript" src="http://disqus.com/forums/$domain/combination_widget.js?num_items=$num_items&color=$color&default_tab=$default_tab"></script>
+EOT;
+      break;
+      }
+      return array('subject' => $subject, 'content' => $content);
+    }
+  break;
+  }
+}

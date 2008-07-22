@@ -50,8 +50,8 @@ function disqus_menu() {
 function disqus_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
   switch ($op) {
     case 'view':
-      // Don't show in the teaser view
-      if (!$a3) {
+      // Only show comments on the full non-teasered page
+      if (!$a3 && $a4) {
         // See if we're to display Disqus
         $types = variable_get('disqus_nodetypes', array());
         if (!empty($types[$node->type]) && user_access('view disqus comments')) {

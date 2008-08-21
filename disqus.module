@@ -82,7 +82,6 @@ function disqus_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
   }
 }
 
-
 /**
  * Implementation of hook_link().
  */
@@ -101,21 +100,10 @@ function disqus_link($type, $node = NULL, $teaser = FALSE) {
       if ($disqus_js_added === FALSE) {
         $disqus_js_added = TRUE;
         $domain = variable_get('disqus_domain', '');
-        $disqus_js = <<<EOT
-//<[CDATA[
-(function() {
-    var links = document.getElementsByTagName('a');
-    var query = '?';
-    for(var i = 0; i < links.length; i++) {
-      if(links[i].href.indexOf('#disqus_thread') >= 0) {
-        query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&';
-      }
-    }
-    document.write('<script type="text/javascript" src="http://disqus.com/forums/$domain/get_num_replies.js' + query + '"></' + 'script>');
-  })();
-//]]>
-EOT;
-        drupal_add_js($disqus_js, 'inline', 'footer');
+		if (!empty($domain)) {
+          $disqus_js = theme('disqus_comments_js', $domain);
+          drupal_add_js($disqus_js, 'inline', 'footer');
+        }
       }
     }
   }
@@ -233,4 +221,39 @@ EOT;
     }
   break;
   }
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function disqus_theme() {
+  return array(
+    'disqus_comments_js' => array(
+      'arguments' => array('domain' => NULL),
+    ),
+  );
+}
+
+/**
+ * Renders the JavaScript to change all Disqus comment links to the correct number of comments.
+ * 
+ * @param $domain
+ *   The Disqus domain associated with this account.
+ */
+function theme_disqus_comments_js($domain) {
+  $disqus_js = <<<EOT
+//<[CDATA[
+(function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+      if(links[i].href.indexOf('#disqus_thread') >= 0) {
+        query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&';
+      }
+    }
+    document.write('<script type="text/javascript" src="http://disqus.com/forums/$domain/get_num_replies.js' + query + '"></' + 'script>');
+  })();
+//]]>
+EOT;
+  return $disqus_js;
 }

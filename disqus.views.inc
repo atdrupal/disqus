@@ -33,7 +33,7 @@ class views_handler_field_node_disqus_comments extends views_handler_field_node_
 	if ($js_added === FALSE) {
       $domain = variable_get('disqus_domain', '');
 	  if (!empty($domain)) {
-        $disqus_js = theme('disqus_comments_js', $domain);
+        $disqus_js = theme('disqus_comments_num', $domain);
         drupal_add_js($disqus_js, 'inline', 'footer');
       }
 	  $js_added = TRUE;
@@ -49,7 +49,7 @@ class views_handler_field_node_disqus_comments extends views_handler_field_node_
     $node->nid = $values->{$this->aliases['nid']};
     $node->type = $values->{$this->aliases['type']};
     $types = variable_get('disqus_nodetypes', array());
-    if (!empty($types[$node->type])) {
+    if (!empty($types[$node->type]) && user_access('view disqus comments')) {
 	  $text = !empty($this->options['text']) ? $this->options['text'] : t('Comments');
 	  return l($text, "node/$node->nid", array('fragment' => 'disqus_thread'));
 	}

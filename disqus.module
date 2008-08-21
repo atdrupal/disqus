@@ -69,11 +69,12 @@ function disqus_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
             $title = check_plain($node->title);
 
             // Inject the script
-            $disqus_developer = variable_get('disqus_developer', FALSE) ? 'var disqus_developer = 1;' : '';
-            $disqus = "<script type=\"text/javascript\">var disqus_title = \"$title\";var disqus_message = \"$message\";$disqus_developer</script><div id=\"disqus_thread\"></div><script type=\"text/javascript\" src=\"http://disqus.com/forums/$domain/embed.js\"></script><noscript><a href=\"http://$domain.disqus.com/?url=ref\">View the forum thread.</a></noscript>";
+            $developer = variable_get('disqus_developer', FALSE);
+            $disqus = theme('disqus_comments', $domain, $title, $message, $developer);
+			
             $node->content['disqus'] = array(
               '#value' => $disqus,
-              '#weight' => 10,
+              '#weight' => 50,
             );
           }
         }
@@ -101,7 +102,7 @@ function disqus_link($type, $node = NULL, $teaser = FALSE) {
         $disqus_js_added = TRUE;
         $domain = variable_get('disqus_domain', '');
 		if (!empty($domain)) {
-          $disqus_js = theme('disqus_comments_js', $domain);
+          $disqus_js = theme('disqus_comments_num', $domain);
           drupal_add_js($disqus_js, 'inline', 'footer');
         }
       }
@@ -228,10 +229,38 @@ EOT;
  */
 function disqus_theme() {
   return array(
-    'disqus_comments_js' => array(
+    'disqus_comments' => array(
+      'arguments' => array(
+	  	'domain' => NULL,
+	  	'title' => NULL,
+	  	'message' => NULL,
+	  	'developer' => NULL
+      ),
+    ),
+    'disqus_comments_num' => array(
       'arguments' => array('domain' => NULL),
     ),
   );
+}
+
+/**
+ * Renders the JavaScript to display the Disqus thread for the current page.
+ * @param $domain
+ *   The domain associated with this Disqus account.
+ * @param $title
+ *   The title of the thread.
+ * @param $message
+ *   The teaser of the thread.
+ * @param $developer
+ *   Whether or not testing is enabled.
+ */
+function theme_disqus_comments($domain, $title = '', $message = '', $developer = FALSE) {
+  $view = t('View the forum thread.');
+  $developer = $developer ? '1' : '0';
+  $disqus = <<<EOT
+<script type="text/javascript">var disqus_title = "$title";var disqus_message = "$message";var disqus_developer = $developer;</script><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/$domain/embed.js"></script><noscript><a href="http://$domain.disqus.com/?url=ref">$view</a></noscript>
+EOT;
+  return $disqus;
 }
 
 /**
@@ -240,7 +269,7 @@ function disqus_theme() {
  * @param $domain
  *   The Disqus domain associated with this account.
  */
-function theme_disqus_comments_js($domain) {
+function theme_disqus_comments_num($domain) {
   $disqus_js = <<<EOT
 //<[CDATA[
 (function() {

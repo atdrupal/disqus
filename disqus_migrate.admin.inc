@@ -51,7 +51,6 @@ function disqus_admin_settings_import_submit($form, &$form_state) {
             // Loop through the comments and import them into Drupal.
             foreach ($article->comments as $thread) {
               foreach($thread->comment as $comment) {
-                dsm($comment->asXML());
                 comment_save(array(
                   'nid' => $nid,
                   'mail' => $comment->email,

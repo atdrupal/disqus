@@ -1,0 +1,7 @@
+; $Id$
+name = Disqus Migrate
+description = Provides migration tools for moving comments between Disqus and the Drupal comment system.
+core = 6.x
+dependencies[] = disqus
+dependencies[] = comment
+php = 5

@@ -14,7 +14,7 @@ function disqus_help($path, $arg) {
     $output.= '<li>'. t('Visit the <a href="@permissions">permissions</a>, and set which users you would like to have the ability to view Disqus threads (recommended for role)', array('@permissions' => url('admin/user/permissions', array('fragment' => 'module-disqus')))) .'</li></ol>';
     return $output;
   case 'admin/settings/disqus':
-    return '<p>'. t('The following provides the configuration options for the <a href="@disqus">Disqus</a> comment web service.', array('@disqus' => 'http://disqus.com')) .'</p>';
+    return '<p>'. t('The following provides the general configuration options for the <a href="@disqus">Disqus</a> comment web service.', array('@disqus' => 'http://disqus.com')) .'</p>';
   }
 }
 
@@ -40,6 +40,12 @@ function disqus_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('disqus_admin_settings'),
     'file' => 'disqus.admin.inc'
+  );
+  $items['admin/settings/disqus/general'] = array(
+    'title' => 'General',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'description' => 'Provides general configuration options for the Disqus comment system.',
+    'weight' => -10,
   );
   return $items;
 }
@@ -231,10 +237,11 @@ function disqus_theme() {
   return array(
     'disqus_comments' => array(
       'arguments' => array(
-	  	'domain' => NULL,
-	  	'title' => NULL,
-	  	'message' => NULL,
-	  	'developer' => NULL
+  	  	'domain' => NULL,
+  	  	'title' => NULL,
+  	  	'message' => NULL,
+  	  	'developer' => NULL,
+        'url' => NULL,
       ),
     ),
     'disqus_comments_num' => array(
@@ -253,12 +260,15 @@ function disqus_theme() {
  *   The teaser of the thread.
  * @param $developer
  *   Whether or not testing is enabled.
+ * @param $url
+ *   The disqus_url variable (http://disqus.com/docs/help/#faq-16).
  */
-function theme_disqus_comments($domain, $title = '', $message = '', $developer = FALSE) {
+function theme_disqus_comments($domain, $title = '', $message = '', $developer = FALSE, $url = NULL) {
   $view = t('View the forum thread.');
   $developer = $developer ? '1' : '0';
+  $url = isset($url) ? 'var disqus_url = "'. $url .'";' : '';
   $disqus = <<<EOT
-<script type="text/javascript">var disqus_title = "$title";var disqus_message = "$message";var disqus_developer = $developer;</script><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/$domain/embed.js"></script><noscript><a href="http://$domain.disqus.com/?url=ref">$view</a></noscript>
+<script type="text/javascript">var disqus_title = "$title";var disqus_message = "$message";var disqus_developer = $developer;$url</script><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/$domain/embed.js"></script><noscript><a href="http://$domain.disqus.com/?url=ref">$view</a></noscript>
 EOT;
   return $disqus;
 }
@@ -285,4 +295,20 @@ function theme_disqus_comments_num($domain) {
 //]]>
 EOT;
   return $disqus_js;
+}
+
+/**
+ * Creates an instance of the Disqus PHP API.
+ *
+ * @param $user_api_key
+ *   The User API Key.
+ * @param $forum_api_key
+ *   The Forum API key.
+ *
+ * @return
+ *   The instance of the Disqus API.
+ */
+function disqus($user_api_key = NULL, $forum_api_key = NULL) {
+  module_load_include('php', 'disqus', 'disqus');
+  return new Disqus($user_api_key, $forum_api_key);
 }

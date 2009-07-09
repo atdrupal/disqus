@@ -64,6 +64,12 @@ function disqus_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
           // Check which Disqus domain to use
           $domain = variable_get('disqus_domain', '');
           if (!empty($domain)) {
+            // Build the absolute URL without the alias for the disqus_url flag
+            $url = url("node/$node->nid", array(
+              'alias' => TRUE,
+              'absolute' => TRUE,
+            ));
+
             // Build the message excerpt
             $message = nl2br($node->teaser);
             $message = str_replace("\r", ' ', $message);
@@ -76,10 +82,9 @@ function disqus_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
 
             // Inject the script
             $developer = variable_get('disqus_developer', FALSE);
-            $disqus = theme('disqus_comments', $domain, $title, $message, $developer);
-			
+
             $node->content['disqus'] = array(
-              '#value' => $disqus,
+              '#value' => theme('disqus_comments', $domain, $title, $message, $developer, $url),
               '#weight' => 50,
             );
           }
@@ -100,18 +105,15 @@ function disqus_link($type, $node = NULL, $teaser = FALSE) {
       $links['disqus_comments'] = array(
         'title' => t('Comments'),
         'href' => "node/$node->nid",
-        'attributes' => array('title' => t('Jump to the comments of this posting.')),
+        'attributes' => array(
+          'title' => t('Jump to the comments of this posting.')
+        ),
+        'alias' => TRUE,
+        'absolute' => TRUE,
         'fragment' => 'disqus_thread',
       );
-      static $disqus_js_added = FALSE;
-      if ($disqus_js_added === FALSE) {
-        $disqus_js_added = TRUE;
-        $domain = variable_get('disqus_domain', '');
-		if (!empty($domain)) {
-          $disqus_js = theme('disqus_comments_num', $domain);
-          drupal_add_js($disqus_js, 'inline', 'footer');
-        }
-      }
+      $domain = variable_get('disqus_domain', '');
+      theme('disqus_comments_num', $domain);
     }
   }
   return $links;
@@ -245,7 +247,10 @@ function disqus_theme() {
       ),
     ),
     'disqus_comments_num' => array(
-      'arguments' => array('domain' => NULL),
+      'arguments' => array(
+        'domain' => NULL,
+        'path' => NULL,
+      ),
     ),
   );
 }
@@ -264,13 +269,28 @@ function disqus_theme() {
  *   The disqus_url variable (http://disqus.com/docs/help/#faq-16).
  */
 function theme_disqus_comments($domain, $title = '', $message = '', $developer = FALSE, $url = NULL) {
-  $view = t('View the forum thread.');
-  $developer = $developer ? '1' : '0';
-  $url = isset($url) ? 'var disqus_url = "'. $url .'";' : '';
-  $disqus = <<<EOT
-<script type="text/javascript">var disqus_title = "$title";var disqus_message = "$message";var disqus_developer = $developer;$url</script><div id="disqus_thread"></div><script type="text/javascript" src="http://disqus.com/forums/$domain/embed.js"></script><noscript><a href="http://$domain.disqus.com/?url=ref">$view</a></noscript>
-EOT;
-  return $disqus;
+  static $added = FALSE;
+  if ($added == FALSE) {
+    drupal_add_css(drupal_get_path('module', 'disqus') .'/disqus/jquery.disqus.css');
+    drupal_add_js(drupal_get_path('module', 'disqus') .'/disqus/jquery.disqus.js');
+    drupal_add_js(drupal_get_path('module', 'disqus') .'/disqus.js');
+    $settings = array('domain' => $domain);
+    if (!empty($title)) {
+      $settings['title'] = $title;
+    }
+    if (!empty($message)) {
+      $settings['message'] = $message;
+    }
+    if (!empty($developer)) {
+      $settings['developer'] = $developer;
+    }
+    if (!empty($url)) {
+      $settings['url'] = $url;
+    }
+    drupal_add_js(array('disqus' => $settings), 'setting');
+    $added = TRUE;
+  }
+  return '<div id="disqus_thread"><a href="http://'. $domain .'.disqus.com/?url=ref">'. t('Discuss this topic on Disqus.') .'</a>';
 }
 
 /**
@@ -278,21 +298,36 @@ EOT;
  * 
  * @param $domain
  *   The Disqus domain associated with this account.
+ * @param $path
+ *   (optional) The path of the full article of who's comments you want to display.
+ * @param $text
+ *   (optional) The text to be displayed in the link.
+ * @return
+ *   If $path is given, will provide a rendered HTML link for the comments.
  */
-function theme_disqus_comments_num($domain) {
-  $disqus_js = <<<EOT
-(function() {
-  var links = document.getElementsByTagName('a');
-  var query = '?';
-  for(var i = 0; i < links.length; i++) {
-    if(links[i].href.indexOf('#disqus_thread') >= 0) {
-      query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&amp;';
-    }
+function theme_disqus_comments_num($domain, $path = NULL, $text = NULL) {
+  static $added = FALSE;
+  if ($added == FALSE) {
+    drupal_add_js(drupal_get_path('module', 'disqus') .'/disqus/jquery.disqus.js');
+    drupal_add_js(drupal_get_path('module', 'disqus') .'/disqus.js');
+    $settings = array(
+      'disqusCommentDomain' => $domain,
+    );
+    drupal_add_js($settings, 'setting');
+    $added = TRUE;
   }
-  document.write('<script type="text/javascript" src="http://disqus.com/forums/$domain/get_num_replies.js' + query + '"></' + 'script>');
-})();
-EOT;
-  return $disqus_js;
+  $text = empty($text) ? t('Comments') : $text;
+  if (isset($path)) {
+    return l($text, $path, array(
+      'attributes' => array(
+        'class' => 'comments',
+        'title' => t('Jump to the comments of this posting.'),
+      ),
+      'alias' => TRUE,
+      'absolute' => TRUE,
+      'fragment' => 'disqus_thread',
+    ));
+  }
 }
 
 /**

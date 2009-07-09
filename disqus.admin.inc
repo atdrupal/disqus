@@ -12,6 +12,12 @@ function disqus_admin_settings() {
     '#description' => t('The domain you registered Disqus with. If you registered http://example.disqus.com, you would enter "example" here.'),
     '#default_value' => variable_get('disqus_domain', ''),
   );
+  $form['disqus_userapikey'] = array(
+    '#type' => 'textfield',
+    '#title' => t('User API Key'),
+    '#description' => t('The API key of the administrator account on Disqus. You can get yours <a href="@key">here</a>.', array('@key' => 'http://disqus.com/api/get_my_key/')),
+    '#default_value' => variable_get('disqus_userapikey', ''),
+  );
   $form['disqus_nodetypes'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Node Types'),

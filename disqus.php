@@ -96,6 +96,7 @@ class Disqus {
 
   /**
    * Returns an array of hashes representing all forums the user owns.
+   *
    * @return
    *   An array of hashes representing all forums the user owns.
    */
@@ -224,6 +225,7 @@ class Disqus {
 
   /**
    * Makes a call to a Disqus API method.
+   *
    * @return 
    *   The Disqus object.
    * @param $method

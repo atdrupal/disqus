@@ -24,21 +24,6 @@ class views_handler_field_node_disqus_comments extends views_handler_field_node_
     parent::construct();
     $this->additional_fields['type'] = 'type';
   }
-  
-  /**
-   * Before rendering the field, add the required JavaScript.
-   */
-  function pre_render($values) {
-  	static $js_added = FALSE;
-	if ($js_added === FALSE) {
-      $domain = variable_get('disqus_domain', '');
-	  if (!empty($domain)) {
-        $disqus_js = theme('disqus_comments_num', $domain);
-        drupal_add_js($disqus_js, 'inline', 'footer');
-      }
-	  $js_added = TRUE;
-	}
-  }
 
   /**
    * When rendering the field.
@@ -50,8 +35,9 @@ class views_handler_field_node_disqus_comments extends views_handler_field_node_
     $node->type = $values->{$this->aliases['type']};
     $types = variable_get('disqus_nodetypes', array());
     if (!empty($types[$node->type]) && user_access('view disqus comments')) {
-	  $text = !empty($this->options['text']) ? $this->options['text'] : t('Comments');
-	  return l($text, "node/$node->nid", array('fragment' => 'disqus_thread'));
-	}
+  	  $text = !empty($this->options['text']) ? $this->options['text'] : t('Comments');
+      $domain = variable_get('disqus_domain', '');
+  	  return theme('disqus_comments_num', $domain, "node/$node->nid", $text);
+  	}
   }
 }

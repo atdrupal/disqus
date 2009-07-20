@@ -81,7 +81,7 @@
   jQuery.disqusLinks = function(domain) {
     // Create the query.
     var query = '?';
-    jQuery("a[@href$='#disqus_thread']").each(function(i) {
+    jQuery("a[href$='#disqus_thread']").each(function(i) {
       query += 'url' + i + '=' + encodeURIComponent($(this).attr('href')) + '&';
     });
 

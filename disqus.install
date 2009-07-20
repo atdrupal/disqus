@@ -39,6 +39,7 @@ function disqus_update_6000(&$sandbox = NULL) {
       }
 
       // Update the thread on the Disqus end.
+      module_load_include('php', 'disqus');
       $disqus = disqus($user_api_key);
       try {
         $forums = $disqus->get_forum_list();

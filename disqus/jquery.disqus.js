@@ -1,13 +1,15 @@
 /**
  * jQuery Disqus Plugin
- * ==================== *
- * A plugin to display Disqus comments on your site using jQuery.
+ * ====================
  *
  * $Id$
  *
- * Copyright (c) 2009 Rob Loach (http://robloach.net) Dual licensed under the
- * MIT (MIT-LICENSE.txt) and GPL 2 (GPL-LICENSE.txt) licenses.
- *
+ * Copyright (c) 2009 Rob Loach (http://robloach.net)
+ * Dual licensed under the MIT (MIT-LICENSE.txt)
+ * and GPL (GPL-LICENSE.txt) licenses.
+ */
+
+/*
  * Usage
  * -----
  *
@@ -27,7 +29,6 @@
  *
  * $.disqusLinks('MYDOMAINNAME');
  */
-
 (function(jQuery) {
   /**
    * Displays the comments for an article in the given element.
@@ -69,7 +70,7 @@
       dataType: 'script',
       cache: true
     });
-  }
+  };
 
   /**
    * Processes the comment links.
@@ -95,5 +96,5 @@
         cache: true
       });
     }
-  }
+  };
 })(jQuery);

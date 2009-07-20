@@ -308,7 +308,7 @@ function theme_disqus_comments($domain, $title = '', $message = '', $developer =
 function theme_disqus_comments_num($domain, $path = NULL, $text = NULL) {
   static $added = FALSE;
   if ($added == FALSE) {
-    drupal_add_js(drupal_get_path('module', 'disqus') .'/disqus/jquery.disqus.js');
+    drupal_add_js(drupal_get_path('module', 'disqus') .'/disqus/jquery.disqus.min.js');
     drupal_add_js(drupal_get_path('module', 'disqus') .'/disqus.js');
     $settings = array(
       'disqusCommentDomain' => $domain,

@@ -67,7 +67,7 @@
       type: 'GET',
       url: 'http://disqus.com/forums/' + options.domain + '/embed.js',
       dataType: 'script',
-      cache: true,
+      cache: true
     });
   }
 
@@ -92,7 +92,7 @@
         type: 'GET',
         url: 'http://disqus.com/forums/' + domain + '/get_num_replies.js' + query,
         dataType: 'script',
-        cache: true,
+        cache: true
       });
     }
   }

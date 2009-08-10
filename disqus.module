@@ -55,42 +55,51 @@ function disqus_menu() {
  */
 function disqus_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
   switch ($op) {
-    case 'view':
-      // Only show comments on the full non-teasered page
-      if (!$a3 && $a4) {
-        // See if we're to display Disqus
-        $types = variable_get('disqus_nodetypes', array());
-        if (!empty($types[$node->type]) && user_access('view disqus comments')) {
-          // Check which Disqus domain to use
-          $domain = variable_get('disqus_domain', '');
-          if (!empty($domain)) {
-            // Build the absolute URL without the alias for the disqus_url flag
-            $url = url("node/$node->nid", array(
-              'alias' => TRUE,
-              'absolute' => TRUE,
-            ));
+    case 'load':
+      // See if Disqus is active on this node.
+      $types = variable_get('disqus_nodetypes', array());
+      if (!empty($types[$node->type])) {
+        // Check which Disqus domain to use.
+        $domain = variable_get('disqus_domain', '');
+        if (!empty($domain)) {
+          // Save the data to the node object.
+          $node->disqus = array('domain' => $domain);
 
-            // Build the message excerpt
-            $message = nl2br($node->teaser);
-            $message = str_replace("\r", ' ', $message);
-            $message = str_replace("\n", ' ', $message);
-            $message = strip_tags($message);
-            $message = check_plain($message);
+          // Build the absolute URL without the alias for the disqus_url flag.
+          $node->disqus['url'] = url("node/$node->nid", array(
+            'alias' => TRUE,
+            'absolute' => TRUE,
+          ));
 
-            // Build the title
-            $title = check_plain($node->title);
+          // Build the message excerpt.
+          $message = nl2br($node->teaser);
+          $message = str_replace("\r", ' ', $message);
+          $message = str_replace("\n", ' ', $message);
+          $message = strip_tags($message);
+          $node->disqus['message'] = check_plain($message);
 
-            // Inject the script
-            $developer = variable_get('disqus_developer', FALSE);
+          // Build the title.
+          $node->disqus['title'] = check_plain($node->title);
 
-            $node->content['disqus'] = array(
-              '#value' => theme('disqus_comments', $domain, $title, $message, $developer, $url),
-              '#weight' => 50,
-            );
+          // Inject the script.
+          if ($developer = variable_get('disqus_developer', FALSE)) {
+            $node->disqus['developer'] = $developer;
           }
         }
       }
-    break;
+      break;
+    case 'view':
+      // See if we are to display Disqus in the current context.
+      if (!$a3 && $a4 && isset($node->disqus)) {
+        if (user_access('view disqus comments') && variable_get('disqus_location', 'content_area') == 'content_area') {
+          // Inject the comments into the node content area.
+          $node->content['disqus'] = array(
+            '#value' => theme('disqus_comments', $node->disqus),
+            '#weight' => 50,
+          );
+        }
+      }
+      break;
   }
 }
 
@@ -99,21 +108,21 @@ function disqus_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
  */
 function disqus_link($type, $node = NULL, $teaser = FALSE) {
   $links = array();
+  // Only show the Disqus links on node teasers.
   if ($type == 'node' && $teaser == TRUE) {
+    // Make sure the context is correct.
     $types = variable_get('disqus_nodetypes', array());
-    if (!empty($types[$node->type]) && user_access('view disqus comments')) {
-      $links['disqus_comments'] = array(
-        'title' => t('Comments'),
-        'href' => "node/$node->nid",
-        'attributes' => array(
-          'title' => t('Jump to the comments of this posting.')
-        ),
+    $domain = variable_get('disqus_domain', '');
+    if (!empty($types[$node->type]) && user_access('view disqus comments') && !empty($domain)) {
+      // Construct the path and inject it into the links area.
+      $path = url("node/$node->nid", array(
         'alias' => TRUE,
         'absolute' => TRUE,
-        'fragment' => 'disqus_thread',
+      ));
+      $links['disqus_comments'] = array(
+        'title' => theme('disqus_comments_num', $domain, $path, t('Comments')),
+        'html' => TRUE,
       );
-      $domain = variable_get('disqus_domain', '');
-      theme('disqus_comments_num', $domain);
     }
   }
   return $links;
@@ -130,6 +139,7 @@ function disqus_block($op = 'list', $delta = 0, $edit = array()) {
       'disqus_popular_threads' => array('info' => t('Disqus Popular Threads'), 'cache' => BLOCK_CACHE_GLOBAL),
       'disqus_top_commenters' => array('info' => t('Disqus Top Commenters'), 'cache' => BLOCK_CACHE_GLOBAL),
       'disqus_combination_widget' => array('info' => t('Disqus Combination Widget'), 'cache' => BLOCK_CACHE_GLOBAL),
+      'disqus_comments' => array('info' => t('Disqus Comments'), 'cache' => BLOCK_NO_CACHE),
     );
   case 'configure':
     $form = array();
@@ -225,6 +235,17 @@ EOT;
 <script type="text/javascript" src="http://disqus.com/forums/$domain/combination_widget.js?num_items=$num_items&amp;color=$color&amp;default_tab=$default_tab"></script>
 EOT;
       break;
+      case 'disqus_comments':
+        if ((variable_get('disqus_location', 'content_area') == 'block') && user_access('view disqus comments')) {
+          if (arg(0) == 'node') {
+            $nid = arg(1);
+            if (is_numeric($nid)) {
+              $node = node_load($nid);
+              $content = isset($node->disqus) ? theme('disqus_comments', $node->disqus) : '';
+            }
+          }
+        }
+        break;
       }
       return array('subject' => $subject, 'content' => $content);
     }
@@ -239,11 +260,7 @@ function disqus_theme() {
   return array(
     'disqus_comments' => array(
       'arguments' => array(
-  	  	'domain' => NULL,
-  	  	'title' => NULL,
-  	  	'message' => NULL,
-  	  	'developer' => NULL,
-        'url' => NULL,
+  	  	'options' => NULL,
       ),
     ),
     'disqus_comments_num' => array(
@@ -257,40 +274,24 @@ function disqus_theme() {
 
 /**
  * Renders the JavaScript to display the Disqus thread for the current page.
- * @param $domain
- *   The domain associated with this Disqus account.
- * @param $title
- *   The title of the thread.
- * @param $message
- *   The teaser of the thread.
- * @param $developer
- *   Whether or not testing is enabled.
- * @param $url
- *   The disqus_url variable (http://disqus.com/docs/help/#faq-16).
+ * @param $options
+ *   An array containing the following items:
+ *     - "domain": The domain associated with this Disqus account.
+ *     - "title": The title of the thread.
+ *     - "message": The teaser of the thread.
+ *     - "developer": Whether or not testing is enabled.
+ *     - "url": The disqus_url variable (http://disqus.com/docs/help/#faq-16).
  */
-function theme_disqus_comments($domain, $title = '', $message = '', $developer = FALSE, $url = NULL) {
+function theme_disqus_comments($options = array()) {
   static $added = FALSE;
   if ($added == FALSE) {
     drupal_add_css(drupal_get_path('module', 'disqus') .'/disqus/jquery.disqus.css');
     drupal_add_js(drupal_get_path('module', 'disqus') .'/disqus/jquery.disqus.js');
     drupal_add_js(drupal_get_path('module', 'disqus') .'/disqus.js');
-    $settings = array('domain' => $domain);
-    if (!empty($title)) {
-      $settings['title'] = $title;
-    }
-    if (!empty($message)) {
-      $settings['message'] = $message;
-    }
-    if (!empty($developer)) {
-      $settings['developer'] = $developer;
-    }
-    if (!empty($url)) {
-      $settings['url'] = $url;
-    }
-    drupal_add_js(array('disqus' => $settings), 'setting');
+    drupal_add_js(array('disqus' => $options), 'setting');
     $added = TRUE;
   }
-  return '<div id="disqus_thread"><a href="http://'. $domain .'.disqus.com/?url=ref">'. t('Discuss this topic on Disqus.') .'</a></div>';
+  return '<div id="disqus_thread"><a href="http://'. $options['domain'] .'.disqus.com/?url=ref">'. t('Discuss this topic on Disqus.') .'</a></div>';
 }
 
 /**

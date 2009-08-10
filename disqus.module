@@ -290,7 +290,7 @@ function theme_disqus_comments($domain, $title = '', $message = '', $developer =
     drupal_add_js(array('disqus' => $settings), 'setting');
     $added = TRUE;
   }
-  return '<div id="disqus_thread"><a href="http://'. $domain .'.disqus.com/?url=ref">'. t('Discuss this topic on Disqus.') .'</a>';
+  return '<div id="disqus_thread"><a href="http://'. $domain .'.disqus.com/?url=ref">'. t('Discuss this topic on Disqus.') .'</a></div>';
 }
 
 /**

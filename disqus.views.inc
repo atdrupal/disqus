@@ -8,7 +8,7 @@ function disqus_views_data() {
   // Number of Disqus comments made on the given node.
   $data['node']['disqus_comments'] = array(
     'field' => array(
-      'title' => t('Disqus Comments'),
+      'title' => t('Disqus: Comments'),
       'help' => t('The number of Disqus comments made on the node.'),
       'handler' => 'views_handler_field_node_disqus_comments',
     ),
@@ -29,15 +29,10 @@ class views_handler_field_node_disqus_comments extends views_handler_field_node_
    * When rendering the field.
    */
   function render($values) {
-    // ensure Disqus comments are available on the node user has access to edit this node.
-    $node = new stdClass();
-    $node->nid = $values->{$this->aliases['nid']};
-    $node->type = $values->{$this->aliases['type']};
-    $types = variable_get('disqus_nodetypes', array());
-    if (!empty($types[$node->type]) && user_access('view disqus comments')) {
-  	  $text = !empty($this->options['text']) ? $this->options['text'] : t('Comments');
-      $domain = variable_get('disqus_domain', '');
-  	  return theme('disqus_comments_num', $domain, "node/$node->nid", $text);
-  	}
+    // Ensure Disqus comments are available on the node user has access to edit this node.
+    $node = node_load($this->aliases['nid']);
+    if (user_access('view disqus comments') && isset($node->disqus)) {
+      return theme('disqus_comments_num', $node->disqus);
+    }
   }
 }

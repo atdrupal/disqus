@@ -1,13 +1,25 @@
 // $Id$
 
 /**
- * Drupal ShareThis behaviors.
+ * Drupal Disqus behaviors.
  */
 Drupal.behaviors.disqus = function(context) {
-  if (Drupal.settings.disqus) {
-    jQuery('#disqus_thread:not(.disqus-processed)', context).addClass('disqus-processed').disqus(Drupal.settings.disqus);
-  }
-  if (Drupal.settings.disqusCommentDomain) {
-    jQuery.disqusLinks(Drupal.settings.disqusCommentDomain);
+  if (Drupal.settings.disqusCommentDomain || false) {
+    // Create the query.
+    var query = '?';
+    jQuery("a[href$='#disqus_thread']").each(function(i) {
+      query += 'url' + i + '=' + encodeURIComponent($(this).attr('href')) + '&';
+    });
+
+    // Make sure we are actually processing some links.
+    if (query.length > 2) {
+      // Make the AJAX call to get the number of comments.
+      jQuery.ajax({
+        type: 'GET',
+        url: 'http://disqus.com/forums/' + Drupal.settings.disqusCommentDomain + '/get_num_replies.js' + query,
+        dataType: 'script',
+        cache: true
+      });
+    }
   }
 };

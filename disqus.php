@@ -11,7 +11,7 @@
  *
  * @package    Disqus
  * @author     Rob Loach (http://www.robloach.net)
- * @version    2.1
+ * @version    1.1.0
  * @access     public
  * @license    GPL (http://www.opensource.org/licenses/gpl-2.0.php)
  *
@@ -40,6 +40,7 @@ class Disqus {
   public $user_api_key = NULL;
   public $forum_api_key = NULL;
   public $api_url = 'http://disqus.com/api/';
+  public $api_version = '1.1';
 
   /**
    * Creates a new interface to the Disqus API.
@@ -58,40 +59,22 @@ class Disqus {
   }
 
   /**
-   * Creates a new post on the thread. Does not check against spam filters or ban list. This is intended to allow automated importing of comments.
-   *
-   * @param $thread_id
-   *   the thread to post to
-   * @param $message
-   *   the content of the post
-   * @param $author_name
-   *   the post creator’s name
-   * @param $author_email
-   *   the post creator’s email address
-   * @param $parent_post
-   *   (optional) the id of the parent post
-   * @param $created_at
-   *   (optional) the UTC date this post was created, in the format %Y-%m-%dT%H:%M (the current time will be used by default)
-   * @param $author_url
-   *   (optional) the author's homepage
-   * @param $ip_address
-   *   (optional) the author’s IP address
-   * @return
-   *   Returns a Hash containing a representation of the post just created.
+   * Validate API key and get username.
    */
-  function create_post($thread_id, $message, $author_name, $author_email, $parent_post = NULL, $created_at = NULL, $author_url = NULL, $ip_address = NULL) {
-    $arguments = array(
-      'thread_id' => $thread_id,
-      'message' => $message,
-      'author_name' => $author_name,
-      'author_email' => $author_email,
-      'author_email' => $author_email,
-      'parent_post' => $parent_post,
-      'created_at' => $created_at,
-      'author_url' => $author_url,
-      'ip_address' => $ip_address,
-    );
-    return $this->call('create_post', $arguments, TRUE);
+  function get_user_name() {
+    return $this->call('get_user_name', array(), TRUE);
+  }
+
+  /**
+   * Get a forum API key for a specific forum.
+   *
+   * @param $forum_id
+   *   the unique id of the forum
+   * @return
+   *   A string which is the Forum Key for the given forum.
+   */
+  function get_forum_api_key($forum_id) {
+    return $this->call('get_forum_api_key', array('forum_id' => $forum_id));
   }
 
   /**
@@ -105,122 +88,200 @@ class Disqus {
   }
 
   /**
-   * Returns A string which is the Forum Key for the given forum.
+   * Get a list of comments on a website.
+   *
+   * Both filter and exclude are multivalue arguments with coma as a divider.
+   * That makes is possible to use combined requests. For example, if you want
+   * to get all deleted spam messages, your filter argument should contain
+   * 'spam,killed' string.
    *
    * @param $forum_id
-   *   the unique id of the forum
+   *   The forum ID.
+   * @param $options
+   *   - limit: Number of entries that should be included in the response. Default is 25.
+   *   - start: Starting point for the query. Default is 0.
+   *   - filter: Type of entries that should be returned.
+   *   - exclude: Type of entries that should be excluded from the response.
    * @return
-   *   A string which is the Forum Key for the given forum.
+   *   Returns posts from a forum specified by id.
    */
-  function get_forum_api_key($forum_id) {
-    return $this->call('get_forum_api_key', array('forum_id' => $forum_id));
+  function get_forum_posts($forum_id, array $options = array()) {
+    $options['forum_id'] = $forum_id;
+    return $this->call('get_forum_posts', $options);
   }
 
   /**
-   * Returns an array of hashes representing all threads belonging to the given forum.
-   *
-   * @param $forum_id
-   *   the unique id of the forum.
-   * @return
-   *   An array of hashes representing all threads belonging to the given forum.
-   */
-  function get_thread_list($forum_id) {
-    return $this->call('get_thread_list', array('forum_id' => $forum_id));
-  }
-
-  /**
-   * Returns a hash having thread_ids as keys and 2-element arrays as values.
-   * 
-   * The first array element is the number of visible comments on on the thread.
-   * This would be useful for showing users of the site (e.g., “5 Comments”).
-   * The second array element is the total number of comments on the thread.
-   * These numbers are different because some forums require moderator approval,
-   * some messages are flagged as spam, etc.
+   * Count a number of comments in articles.
    *
    * @param $thread_ids
    *   an array of thread IDs belonging to the given forum.
    * @return
    *   A hash having thread_ids as keys and 2-element arrays as values.
    */
-  function get_num_posts($thread_ids = array()) {
-    if (is_array($thread_ids)) {
-      $thread_ids = implode(',', $thread_ids);
-    }
+  function get_num_posts(array $thread_ids = array()) {
+    $thread_ids = implode(',', $thread_ids);
     return $this->call('get_num_posts', array('thread_ids' => $thread_ids));
   }
 
   /**
-   * Finds threads associated with the given forum.
+   * Get a list of threads on a website.
    *
-   * Note that there is no one-to-one mapping between threads and URL’s; a
-   * thread will only have an associated URL if it was automatically created by
-   * Disqus javascript embedded on that page. Therefore, we recommend using
-   * thread_by_identifier whenever possible. This method is provided mainly for
-   * handling comments from before your forum was using the API.
-   *
-   * @param $url
-   *   the URL to check for an associated thread
+   * @param $forum_id
+   *   the unique id of the forum.
+   * @param $limit
+   *   Number of entries that should be included in the response.
+   * @param $start
+   *   Starting point for the query.
    * @return
-   *   Returns a hash representing a thread if one was found, otherwise null.
+   *   An array of hashes representing all threads belonging to the given forum.
    */
-  function get_thread_by_url($url) {
-    return $this->call('get_thread_by_url', array('url' => $url));
+  function get_thread_list($forum_id, $limit = 25, $start = 0) {
+    return $this->call('get_thread_list', array('forum_id' => $forum_id, 'limit' => $limit, 'start' => 0));
   }
 
   /**
-   * Returns an array of hashes representing representing all posts belonging to the given forum.
+   * Get a list of threads with new comments.
+   *
+   * @param $forum_id
+   *   The Forum ID.
+   * @param $since
+   *   Start date for new posts. Format: 2009-03-30T15:41, Timezone: UTC.
+   */
+  function get_updated_threads($forum_id, $since) {
+    return $this->call('get_updated_threads', array('forum_id' => $forum_id, 'since' => $since));
+  }
+
+  /**
+   * Get a list of comments in a thread.
+   *
+   * Both filter and exclude are multivalue arguments with coma as a divider.
+   * That makes is possible to use combined requests. For example, if you want
+   * to get all deleted spam messages, your filter argument should contain
+   * 'spam,killed' string. Note that values are joined by AND statement so
+   * 'spam,new' will return all messages that are new and marked as spam. It
+   * will not return messages that are new and not spam or that are spam but
+   * not new (i.e. has already been moderated).
    *
    * @param $thread_id
    *   The ID of a thread belonging to the given forum
+   * @param $limit
+   *   - limit: Number of entries that should be included in the response. Default is 25.
+   *   - start: Starting point for the query. Default is 0.
+   *   - filter: Type of entries that should be returned (new, spam or killed).
+   *   - exclude: Type of entries that should be excluded from the response (new, spam or killed).
    * @return
    *   An array of hashes representing representing all posts belonging to the
    *   given forum.
    */
-  function get_thread_posts($thread_id) {
-    return $this->call('get_thread_posts', array('thread_id' => $thread_id));
+  function get_thread_posts($thread_id, array $options = array()) {
+    $options['thread_id'] = $thread_id;
+    return $this->call('get_thread_posts', $options);
   }
 
   /**
-   * Create or retrieve a thread by an arbitrary identifying string of your
-   * choice. For example, you could use your local database’s ID for the thread.
-   * This method allows you to decouple thread identifiers from the URL’s on
-   * which they might be appear. (Disqus would normally use a thread’s URL to
-   * identify it, which is problematic when URL’s do not uniquely identify a
-   * resource.) If no thread exists for the given identifier yet (paired with
-   * the forum), one will be created.
+   * Get or create thread by identifier.
    *
+   * This method tries to find a thread by its identifier and title. If there is
+   * no such thread, the method creates it. In either case, the output value is
+   * a thread object.
+   *
+   * @param $identifier
+   *   Unique value (per forum) for a thread that is used to keep be able to get
+   *   data even if permalink is changed.
    * @param $title
    *   The title of the thread to possibly be created.
-   * @param $identifier
-   *   A string of your choosing.
    * @return
    *   Returns a hash with two keys:
    *   - thread: a hash representing the thread corresponding to the identifier.
    *   - created: indicates whether the thread was created as a result of this
    *     method call. If created, it will have the specified title.
    */
-  function thread_by_identifier($title, $identifier) {
+  function thread_by_identifier($identifier, $title) {
     return $this->call('thread_by_identifier', array('title' => $title, 'identifier' => $identifier), TRUE);
   }
 
   /**
-   * Sets the provided values on the thread object.
+   * Get thread by URL.
+   *
+   * Finds a thread by its URL. Output value is a thread object.
+   *
+   * @param $url
+   *   the URL to check for an associated thread
+   * @param $partner_api_key
+   *   (optional) The Partner API key.
+   * @return
+   *   A thread object, otherwise NULL.
+   */
+  function get_thread_by_url($url, $partner_api_key = NULL) {
+    return $this->call('get_thread_by_url', array('url' => $url));
+  }
+
+  /**
+   * Updates thread.
+   *
+   * Updates thread, specified by id and forum API key, with values described in
+   * the optional arguments.
    *
    * @param $thread_id
    *   the ID of a thread belonging to the given forum
-   * @param $title
-   *   the title of the thread
-   * @param $slug
-   *   the per-forum-unique string used for identifying this thread in disqus.com URL’s relating to this thread. Composed of underscore-separated alphanumeric strings.
-   * @param $url
-   *   the URL this thread is on, if known.
-   * @param $allow_comments
-   *   whether this thread is open to new comments
+   * @param $options
+   *   - title: the title of the thread
+   *   - slug: the per-forum-unique string used for identifying this thread in
+   *           disqus.com URL’s relating to this thread. Composed of
+   *           underscore-separated alphanumeric strings.
+   *   - url: the URL this thread is on, if known.
+   *   - allow_comments: whether this thread is open to new comments
    * @return
    *   Returns an empty success message.
    */
-  function update_thread($thread_id, $title = NULL, $slug = NULL, $url = NULL, $allow_comments = NULL) {
-    return $this->call('update_thread', array('thread_id' => $thread_id, 'title' => $title, 'slug' => $slug, 'url' => $url, 'allow_comments' => $allow_comments), TRUE);
+  function update_thread($thread_id, array $options = array()) {
+    $options['thread_id'] = $thread_id;
+    return $this->call('update_thread', $options, TRUE);
+  }
+
+  /**
+   * Creates a new post.
+   *
+   * Creates a comment to the thread specified by id.
+   *
+   * @param $thread_id
+   *   the thread to post to
+   * @param $message
+   *   the content of the post
+   * @param $author_name
+   *   the post creator’s name
+   * @param $author_email
+   *   the post creator’s email address
+   * @param $options
+   *   - partner_api_key
+   *   - created_at: Format: 2009-03-30T15:41, Timezone: UTC
+   *   - ip_address: the author’s IP address
+   *   - author_url: the author's homepage
+   *   - parent_post: the id of the parent post
+   *   - state: Comment's state, must be one of the following: approved,
+   *            unapproved, spam, killed
+   */
+  function create_post($thread_id, $message, $author_name, $author_email, array $options = array()) {
+    $options['thread_id'] = $thread_id;
+    $options['message'] = $message;
+    $options['author_name'] = $author_name;
+    $options['author_email'] = $author_email;
+    return $this->call('create_post', $options, TRUE);
+  }
+
+  /**
+   * Delete a comment or mark it as spam (or not spam).
+   *
+   * @param $post_id
+   *   The Post ID.
+   * @param $action
+   *   Name of action to be performed. Value can be 'spam', 'approve' or 'kill'.
+   *
+   * @return
+   *   Returns modified version.
+   */
+  function moderate_post($post_id, $action) {
+    return $this->call('create_post', array('post_id' => $post_id, 'action' => $action), TRUE);
   }
 
   /**
@@ -243,6 +304,9 @@ class Disqus {
     }
     if (!isset($arguments['forum_api_key'])) {
       $arguments['forum_api_key'] = $this->forum_api_key;
+    }
+    if (!isset($arguments['api_version'])) {
+      $arguments['api_version'] = $this->api_version;
     }
     foreach ($arguments as $argument => $value) {
       if (!empty($value)) {
@@ -271,10 +335,10 @@ class Disqus {
       $disqus = json_decode($data);
       if ($disqus->succeeded) {
         // There weren't any errors, so return the results.
-        return $disqus->message;
+        return isset($disqus->message) ? $disqus->message : NULL;
       }
       else {
-        throw new DisqusException($disqus->message, 0, $info, $disqus);
+        throw new DisqusException(isset($disqus->message) ? $disqus->message : NULL, 0, $info, $disqus);
       }
     }
     else {

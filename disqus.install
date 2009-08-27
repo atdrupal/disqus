@@ -39,7 +39,6 @@ function disqus_update_6000(&$sandbox = NULL) {
       }
 
       // Update the thread on the Disqus end.
-      module_load_include('php', 'disqus');
       $disqus = disqus($user_api_key);
       try {
         $forums = $disqus->get_forum_list();
@@ -91,7 +90,7 @@ function disqus_update_6000(&$sandbox = NULL) {
     }
 
     // Create the disqus interface.
-    $disqus = new disqus($user_api_key, $sandbox['forum_api_key']);
+    $disqus = disqus($user_api_key, $sandbox['forum_api_key']);
 
     // Go through each node and update the path on the Disqus end in batches.
     $url_aliases = db_query_range("SELECT pid, dst, src FROM {url_alias} WHERE pid > %d AND src LIKE 'node/%' ORDER BY pid ASC", $sandbox['current_pid'], 0, 5);
@@ -121,7 +120,7 @@ function disqus_update_6000(&$sandbox = NULL) {
           'alias' => TRUE, // State that it's already an alias.
         ));
         try {
-          $disqus->update_thread($thread->id, $thread->title, $thread->slug, $url, TRUE);
+          $disqus->update_thread($thread->id, array('url' => $url));
         }
         catch (DisqusException $exception) {
           // Don't exit if updating the thread fails.

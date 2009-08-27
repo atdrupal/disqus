@@ -25,6 +25,7 @@ function disqus_perm() {
   return array(
     'administer disqus',
     'view disqus comments',
+    'display disqus comments on profile',
   );
 }
 
@@ -81,6 +82,9 @@ function disqus_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
           // Build the title.
           $node->disqus['title'] = check_plain($node->title);
 
+          // Provide the identifier.
+          $node->disqus['identifier'] = 'node/' . $node->nid;
+
           // Inject the script.
           if ($developer = variable_get('disqus_developer', FALSE)) {
             $node->disqus['developer'] = $developer;
@@ -95,11 +99,60 @@ function disqus_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
           // Inject the comments into the node content area.
           $node->content['disqus'] = array(
             '#value' => theme('disqus_comments', $node->disqus),
-            '#weight' => 50,
+            '#weight' => variable_get('disqus_weight', 50),
           );
         }
       }
       break;
+  }
+}
+
+/**
+ * Implementation of hook_user().
+ */
+function disqus_user($op, &$edit, &$account, $category = NULL) {
+  switch ($op) {
+    case 'load':
+      // Only show on the profile if desired. Don't show on the administrator's profile.
+      if (user_access('display disqus comments on profile', $account) && $account->uid != 1) {
+        // Check which Disqus domain to use.
+        $domain = variable_get('disqus_domain', '');
+        if (!empty($domain)) {
+          // Save the data to the user object.
+          $account->disqus = array('domain' => $domain);
+        }
+
+        // Build the absolute URL without the alias for the disqus_url flag.
+        $account->disqus['url'] = url("user/$account->uid", array(
+          'alias' => TRUE,
+          'absolute' => TRUE,
+        ));
+
+        // Build the message excerpt.
+        $account->disqus['message'] = check_plain($account->name);
+
+        // Build the title.
+        $account->disqus['title'] = check_plain($account->name);
+
+        // Provide the identifier.
+        $account->disqus['identifier'] = 'user/' . $account->uid;
+
+        // Inject the script.
+        if ($developer = variable_get('disqus_developer', FALSE)) {
+          $account->disqus['developer'] = $developer;
+        }
+      }
+      break;
+    case 'view':
+      if (user_access('view disqus comments') && variable_get('disqus_location', 'content_area') == 'content_area') {
+        if (isset($account->disqus)) {
+          $account->content['disqus'] = array(
+            '#value' => theme('disqus_comments', $account->disqus),
+            '#weight' => variable_get('disqus_weight', 50),
+          );
+        }
+      }
+    break;
   }
 }
 
@@ -135,11 +188,11 @@ function disqus_block($op = 'list', $delta = 0, $edit = array()) {
   switch ($op) {
   case 'list':
     return array(
-      'disqus_recent_comments' => array('info' => t('Disqus Recent Comments'), 'cache' => BLOCK_CACHE_GLOBAL),
-      'disqus_popular_threads' => array('info' => t('Disqus Popular Threads'), 'cache' => BLOCK_CACHE_GLOBAL),
-      'disqus_top_commenters' => array('info' => t('Disqus Top Commenters'), 'cache' => BLOCK_CACHE_GLOBAL),
-      'disqus_combination_widget' => array('info' => t('Disqus Combination Widget'), 'cache' => BLOCK_CACHE_GLOBAL),
-      'disqus_comments' => array('info' => t('Disqus Comments'), 'cache' => BLOCK_NO_CACHE),
+      'disqus_recent_comments' => array('info' => t('Disqus: Recent Comments'), 'cache' => BLOCK_CACHE_GLOBAL),
+      'disqus_popular_threads' => array('info' => t('Disqus: Popular Threads'), 'cache' => BLOCK_CACHE_GLOBAL),
+      'disqus_top_commenters' => array('info' => t('Disqus: Top Commenters'), 'cache' => BLOCK_CACHE_GLOBAL),
+      'disqus_combination_widget' => array('info' => t('Disqus: Combination Widget'), 'cache' => BLOCK_CACHE_GLOBAL),
+      'disqus_comments' => array('info' => t('Disqus: Comments'), 'cache' => BLOCK_NO_CACHE),
     );
   case 'configure':
     $form = array();
@@ -148,6 +201,7 @@ function disqus_block($op = 'list', $delta = 0, $edit = array()) {
       '#title' => t('Number of items to show'),
       '#options' => array(1 => 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
       '#default_value' => variable_get($delta .'_items', 5),
+      '#access' => ($delta != 'disqus_comments'),
     );
     $form[$delta .'_showavatars'] = array(
       '#type' => 'select',
@@ -180,7 +234,7 @@ function disqus_block($op = 'list', $delta = 0, $edit = array()) {
         'orange' => t('Orange'),
       ),
       '#default_value' => variable_get($delta .'_colortheme', 'blue'),
-      '#access' => $delta == 'disqus_combination_widget'
+      '#access' => $delta == 'disqus_combination_widget',
     );
     $form[$delta .'_defaulttabview'] = array(
       '#type' => 'select',
@@ -191,15 +245,17 @@ function disqus_block($op = 'list', $delta = 0, $edit = array()) {
         'popular' => t('Popular'),
       ),
       '#default_value' => variable_get($delta .'_defaulttabview', 'people'),
-      '#access' => $delta == 'disqus_combination_widget'
+      '#access' => $delta == 'disqus_combination_widget',
     );
     return $form;
   case 'save':
-    variable_set($delta .'_items', $edit[$delta .'_items']);
-    variable_set($delta .'_showavatars', $edit[$delta .'_showavatars']);
-    variable_set($delta .'_avatarsize', $edit[$delta .'_avatarsize']);
-    variable_set($delta .'_colortheme', $edit[$delta .'_colortheme']);
-    variable_set($delta .'_defaulttabview', $edit[$delta .'_defaulttabview']);
+    if ($delta != 'disqus_comments') {
+      variable_set($delta .'_items', $edit[$delta .'_items']);
+      variable_set($delta .'_showavatars', $edit[$delta .'_showavatars']);
+      variable_set($delta .'_avatarsize', $edit[$delta .'_avatarsize']);
+      variable_set($delta .'_colortheme', $edit[$delta .'_colortheme']);
+      variable_set($delta .'_defaulttabview', $edit[$delta .'_defaulttabview']);
+    }
   break;
   case 'view':
     $num_items = variable_get($delta .'_items', 5);
@@ -237,12 +293,18 @@ EOT;
       break;
       case 'disqus_comments':
         if ((variable_get('disqus_location', 'content_area') == 'block') && user_access('view disqus comments')) {
-          if (arg(0) == 'node') {
-            $nid = arg(1);
-            if (is_numeric($nid)) {
-              $node = node_load($nid);
-              $content = isset($node->disqus) ? theme('disqus_comments', $node->disqus) : '';
-            }
+          $item = menu_get_item();
+          switch ($item['path']) {
+            case 'node/%':
+              if ($disqus = isset($item['page_arguments'][0]->disqus) ? $item['page_arguments'][0]->disqus : FALSE) {
+                $content = theme('disqus_comments', $disqus);
+              }
+              break;
+            case 'user/%':
+              if ($disqus = isset($item['page_arguments'][0]->disqus) ? $item['page_arguments'][0]->disqus : FALSE) {
+                $content = theme('disqus_comments', $disqus);
+              }
+              break;
           }
         }
         break;
@@ -250,6 +312,39 @@ EOT;
       return array('subject' => $subject, 'content' => $content);
     }
   break;
+  }
+}
+
+/**
+ * Implementation of hook_footer().
+ *
+ * @param $disqus_options
+ *   The options to pass off to the Disqus comments.
+ */
+function disqus_footer($main = 0, $disqus_options = NULL) {
+  static $disqus = FALSE;
+  if (isset($disqus_options)) {
+    $disqus = $disqus_options;
+  }
+  if ($disqus) {
+    $domain = variable_get('disqus_domain', '');
+    if (!empty($domain)) {
+      $output = '<script type="text/javascript">';
+      if ($disqus['developer']) {
+        $output .= 'var disqus_developer = 1;';
+      }
+      $output .= 'var disqus_url = '. drupal_to_js($disqus['url']) .';';
+      $output .= 'var disqus_title = '. drupal_to_js($disqus['title']) .';';
+      $output .= 'var disqus_message = '. drupal_to_js($disqus['message']) .';';
+      $output .= 'var disqus_identifier = '. drupal_to_js($disqus['identifier']) .';';
+      global $user;
+      if ($user->uid > 0) {
+        $output .= 'var disqus_def_name = '. drupal_to_js($user->name) .';';
+        $output .= 'var disqus_def_email = '. drupal_to_js($user->mail) .';';
+      }
+      $output .= "</script><script type='text/javascript' src='http://disqus.com/forums/$domain/embed.js'></script>";
+      return $output;
+    }
   }
 }
 
@@ -283,15 +378,8 @@ function disqus_theme() {
  *     - "url": The disqus_url variable (http://disqus.com/docs/help/#faq-16).
  */
 function theme_disqus_comments($options = array()) {
-  static $added = FALSE;
-  if ($added == FALSE) {
-    drupal_add_css(drupal_get_path('module', 'disqus') .'/disqus/jquery.disqus.css');
-    drupal_add_js(drupal_get_path('module', 'disqus') .'/disqus/jquery.disqus.js');
-    drupal_add_js(drupal_get_path('module', 'disqus') .'/disqus.js');
-    drupal_add_js(array('disqus' => $options), 'setting');
-    $added = TRUE;
-  }
-  return '<div id="disqus_thread"><a href="http://'. $options['domain'] .'.disqus.com/?url=ref">'. t('Discuss this topic on Disqus.') .'</a></div>';
+  disqus_footer(0, $options);
+  return '<div id="disqus_thread"></div><noscript><a href="http://'. $options['domain'] .'.disqus.com/?url='. urlencode($options['url']) .'">'. t('View the discussion thread.') .'</a></noscript>';
 }
 
 /**
@@ -309,12 +397,8 @@ function theme_disqus_comments($options = array()) {
 function theme_disqus_comments_num($domain, $path = NULL, $text = NULL) {
   static $added = FALSE;
   if ($added == FALSE) {
-    drupal_add_js(drupal_get_path('module', 'disqus') .'/disqus/jquery.disqus.min.js');
     drupal_add_js(drupal_get_path('module', 'disqus') .'/disqus.js');
-    $settings = array(
-      'disqusCommentDomain' => $domain,
-    );
-    drupal_add_js($settings, 'setting');
+    drupal_add_js(array('disqusCommentDomain' => $domain), 'setting');
     $added = TRUE;
   }
   $text = empty($text) ? t('Comments') : $text;

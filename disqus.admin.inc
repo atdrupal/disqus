@@ -41,6 +41,13 @@ function disqus_admin_settings() {
       'block' => t('Block'),
     ),
   );
+  $form['visibility']['disqus_weight'] = array(
+    '#type' => 'select',
+    '#title' => t('Weight'),
+    '#description' => t('When the comments are displayed in the content area, you can change the position at which they will be shown.'),
+    '#default_value' => variable_get('disqus_weight', 50),
+    '#options' => drupal_map_assoc(array(-100, -50, -25, 0, 25, 50, 100)),
+  );
   $form['disqus_behavior'] = array(
     '#type' => 'fieldset',
     '#title' => t('Behavior'),

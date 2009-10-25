@@ -330,7 +330,7 @@ function disqus_footer($main = 0, $disqus_options = NULL) {
     $domain = variable_get('disqus_domain', '');
     if (!empty($domain)) {
       $output = '<script type="text/javascript">';
-      if ($disqus['developer']) {
+      if (isset($disqus['developer'])) {
         $output .= 'var disqus_developer = 1;';
       }
       $output .= 'var disqus_url = '. drupal_to_js($disqus['url']) .';';

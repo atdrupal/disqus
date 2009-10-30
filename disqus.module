@@ -85,9 +85,12 @@ function disqus_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
           // Provide the identifier.
           $node->disqus['identifier'] = 'node/' . $node->nid;
 
-          // Inject the script.
-          if ($developer = variable_get('disqus_developer', FALSE)) {
-            $node->disqus['developer'] = $developer;
+          // The developer flag must always be set when the node is unpublished.
+          if ($node->status == 0) {
+            $node->disqus['developer'] = 1;
+          }
+          elseif ($developer = variable_get('disqus_developer', FALSE)) {
+            $node->disqus['developer'] = intval($developer);
           }
         }
       }

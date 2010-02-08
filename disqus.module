@@ -10,8 +10,8 @@ function disqus_help($path, $arg) {
     $output = '<p>'. t('Uses the <a href="@disqus">Disqus</a> comment system to enhance comments.', array('@disqus' => 'http://disqus.com')) .'</p>';
     $output.= '<h3>'. t('Installation') .'</h3>';
     $output.= '<ol><li>'. t('Register your site information at <a href="http://disqus.com">Disqus</a>') .'</li>';
-    $output.= '<li>'. t('In the <a href="@configuration">Disqus configuration</a>, set the domain to what you registered with Disqus, and what node types you would like to have comments', array('@configuration' => url('admin/settings/disqus'))) .'</li>';
-    $output.= '<li>'. t('Visit the <a href="@permissions">permissions</a>, and set which users you would like to have the ability to view Disqus threads (recommended for role)', array('@permissions' => url('admin/user/permissions', array('fragment' => 'module-disqus')))) .'</li></ol>';
+    $output.= '<li>'. t('In the <a href="@configuration">Disqus configuration</a>, set the domain to what you registered with Disqus, and what node types you would like to have comments', array('@configuration' => url('admin/config/system/disqus'))) .'</li>';
+    $output.= '<li>'. t('Visit the <a href="@permissions">permissions</a>, and set which users you would like to have the ability to view Disqus threads (recommended for role)', array('@permissions' => url('admin/people/permissions', array('fragment' => 'module-disqus')))) .'</li></ol>';
     return $output;
   case 'admin/config/system/disqus':
     return '<p>'. t('The following provides the general configuration options for the <a href="@disqus">Disqus</a> comment web service.', array('@disqus' => 'http://disqus.com')) .'</p>';
@@ -360,30 +360,12 @@ EOT;
 }
 
 /**
- * Implements hook_page_alter().
- */
-function disqus_page_alter(&$page, $disqus_options = NULL) {
-  static $disqus = FALSE;
-  if (isset($disqus_options)) {
-    $disqus = $disqus_options;
-  }
-  if ($disqus) {
-  }
-}
-
-/**
  * Implements hook_theme().
  */
 function disqus_theme() {
   return array(
     'disqus_comments' => array(
       'variables' => array('disqus' => NULL),
-    ),
-    'disqus_comments_num' => array(
-      'variables' => array(
-        'domain' => NULL,
-        'path' => NULL,
-      ),
     ),
   );
 }

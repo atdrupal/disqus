@@ -1,4 +1,9 @@
 ; $Id$
 name = Disqus
 description = Uses the Disqus web service to enhance comments.
-core = 6.x
+core = 7.x
+php = 5
+files[] = disqus.admin.inc
+files[] = disqus.install
+files[] = disqus.module
+files[] = disqus.php

@@ -12,24 +12,26 @@ function disqus_admin_settings() {
     '#description' => t('The domain you registered Disqus with. If you registered http://example.disqus.com, you would enter "example" here.'),
     '#default_value' => variable_get('disqus_domain', ''),
   );
-  $form['disqus_userapikey'] = array(
-    '#type' => 'textfield',
-    '#title' => t('User API Key'),
-    '#description' => t('The API key of the administrator account on Disqus. You can get yours <a href="@key">here</a>.', array('@key' => 'http://disqus.com/api/get_my_key/')),
-    '#default_value' => variable_get('disqus_userapikey', ''),
+  $form['settings'] = array(
+    '#type' => 'vertical_tabs',
+    '#weight' => 50,
   );
   $form['visibility'] = array(
     '#type' => 'fieldset',
     '#title' => t('Visibility'),
-    '#collapsed' => FALSE,
-    '#collapsible' => TRUE,
+    '#group' => 'settings',
   );
+  $types = node_type_get_types();
+  $options = array();
+  foreach ($types as $type) {
+    $options[$type->type] = $type->name;
+  }
   $form['visibility']['disqus_nodetypes'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Node Types'),
     '#description' => t('Apply comments to only the following node types.'),
     '#default_value' => variable_get('disqus_nodetypes', array()),
-    '#options' => node_get_types('names'),
+    '#options' => $options,
   );
   $form['visibility']['disqus_location'] = array(
     '#type' => 'select',
@@ -48,17 +50,22 @@ function disqus_admin_settings() {
     '#default_value' => variable_get('disqus_weight', 50),
     '#options' => drupal_map_assoc(array(-100, -50, -25, 0, 25, 50, 100)),
   );
-  $form['disqus_behavior'] = array(
+  $form['behavior'] = array(
     '#type' => 'fieldset',
     '#title' => t('Behavior'),
-    '#collapsed' => TRUE,
-    '#collapsible' => TRUE,
+    '#group' => 'settings',
   );
-  $form['disqus_behavior']['disqus_developer'] = array(
+  $form['behavior']['disqus_developer'] = array(
     '#type' => 'checkbox',
     '#title' => t('Testing'),
     '#description' => t('When enabled, uses the <a href="http://disqus.com/help/#faq-14">disqus_developer</a> flag to tell Disqus that you are in a testing environment. Threads will not display on the public community page with this set.'),
     '#default_value' => variable_get('disqus_developer', FALSE),
+  );
+  $form['behavior']['disqus_userapikey'] = array(
+    '#type' => 'textfield',
+    '#title' => t('User API Key'),
+    '#description' => t('The API key of the administrator account on Disqus. You can get yours <a href="@key">here</a>.', array('@key' => 'http://disqus.com/api/get_my_key/')),
+    '#default_value' => variable_get('disqus_userapikey', ''),
   );
   return system_settings_form($form);
 }

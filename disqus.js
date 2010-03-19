@@ -5,8 +5,8 @@
  * Drupal Disqus behavior.
  */
 Drupal.behaviors.disqus = {
-  attach: function (context) {
-    if (Drupal.settings.disqusCommentDomain || false) {
+  attach: function (context, settings) {
+    if (settings.disqusCommentDomain || false) {
       // Create the query.
       var query = '?';
       jQuery("a[href$='#disqus_thread']").each(function(i) {
@@ -18,7 +18,7 @@ Drupal.behaviors.disqus = {
         // Make the AJAX call to get the number of comments.
         jQuery.ajax({
           type: 'GET',
-          url: 'http://disqus.com/forums/' + Drupal.settings.disqusCommentDomain + '/get_num_replies.js' + query,
+          url: 'http://disqus.com/forums/' + settings.disqusCommentDomain + '/get_num_replies.js' + query,
           dataType: 'script',
           cache: true
         });

@@ -10,10 +10,8 @@
  * Implements hook_uninstall().
  */
 function disqus_uninstall() {
-  variable_del('disqus_domain');
-  variable_del('disqus_userapikey');
-  variable_del('disqus_nodetypes');
-  variable_del('disqus_developer');
+  // Remove all Disqus-related variables.
+  db_delete('variable')->condition('name', 'disqus_%', 'LIKE')->execute();
 }
 
 /**

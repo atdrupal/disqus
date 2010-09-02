@@ -36,11 +36,12 @@ function disqus_admin_settings() {
   $form['visibility']['disqus_location'] = array(
     '#type' => 'select',
     '#title' => t('Location'),
-    '#description' => t('Display the Disqus comments in the given location. When "Block" is selected, the comments will appear in the <a href="@disquscomments">Disqus Comments block</a>.', array('@disquscomments' => url('admin/build/block'))),
+    '#description' => t('Display the Disqus comments in the given location. When "Block" is selected, the comments will appear in the <a href="@disquscomments">Disqus Comments block</a>. The "Injected Variable" option will provide a variable for precise placement of the comments.', array('@disquscomments' => url('admin/build/block'))),
     '#default_value' => variable_get('disqus_location', 'content_area'),
     '#options' => array(
       'content_area' => t('Content Area'),
       'block' => t('Block'),
+      'variable' => t('Injected Variable'),
     ),
   );
   $form['visibility']['disqus_weight'] = array(
@@ -48,7 +49,7 @@ function disqus_admin_settings() {
     '#title' => t('Weight'),
     '#description' => t('When the comments are displayed in the content area, you can change the position at which they will be shown.'),
     '#default_value' => variable_get('disqus_weight', 50),
-    '#options' => drupal_map_assoc(array(-100, -50, -25, 0, 25, 50, 100)),
+    '#options' => drupal_map_assoc(array(-100, -75, -50, -25, 0, 25, 50, 75, 100)),
   );
   $form['behavior'] = array(
     '#type' => 'fieldset',

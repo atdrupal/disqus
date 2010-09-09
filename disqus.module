@@ -57,7 +57,7 @@ function disqus_menu() {
 /**
  * Implements hook_node_load().
  */
-function disqus_node_load(&$nodes, $types) {
+function disqus_node_load($nodes, $types) {
   // Make sure we only load Disqus on nodes of the desired types.
   $disqustypes = variable_get('disqus_nodetypes', array());
 
@@ -181,7 +181,7 @@ function disqus_node_view($node, $view_mode) {
 /**
  * Implements hook_user_load().
  */
-function disqus_user_load(&$users) {
+function disqus_user_load($users) {
   // Check which Disqus domain to use.
   $domain = variable_get('disqus_domain', '');
   if (!empty($domain)) {
@@ -218,7 +218,7 @@ function disqus_user_load(&$users) {
 /**
  * Implements hook_user_view().
  */
-function disqus_user_view(&$account, $view_mode) {
+function disqus_user_view($account, $view_mode) {
   if (isset($account->disqus) && $view_mode == 'full' && user_access('view disqus comments')) {
     // Inject Disqus into the user object.
     switch (variable_get('disqus_location', 'content_area')) {

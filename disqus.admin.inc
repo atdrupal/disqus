@@ -8,8 +8,8 @@ function disqus_admin_settings() {
   $form = array();
   $form['disqus_domain'] = array(
     '#type' => 'textfield',
-    '#title' => t('Domain'),
-    '#description' => t('The domain you registered Disqus with. If you registered http://example.disqus.com, you would enter "example" here.'),
+    '#title' => t('Shortname'),
+    '#description' => t('The website shortname that you registered Disqus with. If you registered http://example.disqus.com, you would enter "example" here.'),
     '#default_value' => variable_get('disqus_domain', ''),
   );
   $form['settings'] = array(

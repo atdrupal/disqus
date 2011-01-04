@@ -102,13 +102,13 @@ function disqus_node_load($nodes, $types) {
 }
 
 /**
- * Implements hook_elements().
+ * Implements hook_element_info().
  */
 function disqus_element_info() {
   $types['disqus'] = array(
     '#disqus' => array(),
     '#theme_wrappers' => array('disqus_noscript', 'container'),
-    '#id' => 'disqus_thread',
+    '#attributes' => array('id' => 'disqus_thread'),
     '#post_render' => array('disqus_element_post_render'),
   );
   return $types;

@@ -464,7 +464,7 @@ function disqus_theme() {
 function theme_disqus_noscript($variables = array()) {
   $disqus = $variables['disqus'];
   // Return the comment markup.
-  return '<noscript>' . l(t('View the discussion thread.'), 'http://' . $disqus['domain'] . '.disqus.com/?url=' . urlencode($disqus['url'])) . '</noscript>';
+  return '<noscript><p>' . l(t('View the discussion thread.'), 'http://' . $disqus['domain'] . '.disqus.com/?url=' . urlencode($disqus['url'])) . '</p></noscript>';
 }
 
 /**

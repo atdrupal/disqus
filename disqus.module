@@ -10,10 +10,10 @@ function disqus_help($path, $arg) {
     $output = '<p>'. t('Uses the <a href="@disqus">Disqus</a> comment system to enhance comments.', array('@disqus' => 'http://disqus.com')) .'</p>';
     $output.= '<h3>'. t('Installation') .'</h3>';
     $output.= '<ol><li>'. t('Register your site information at <a href="http://disqus.com">Disqus</a>') .'</li>';
-    $output.= '<li>'. t('In the <a href="@configuration">Disqus configuration</a>, set the domain to what you registered with Disqus, and what node types you would like to have comments', array('@configuration' => url('admin/config/system/disqus'))) .'</li>';
+    $output.= '<li>'. t('In the <a href="@configuration">Disqus configuration</a>, set the domain to what you registered with Disqus, and what node types you would like to have comments', array('@configuration' => url('admin/config/services/disqus'))) .'</li>';
     $output.= '<li>'. t('Visit the <a href="@permissions">permissions</a>, and set which users you would like to have the ability to view Disqus threads (recommended for role)', array('@permissions' => url('admin/people/permissions', array('fragment' => 'module-disqus')))) .'</li></ol>';
     return $output;
-  case 'admin/config/system/disqus':
+  case 'admin/config/services/disqus':
     return '<p>'. t('The following provides the general configuration options for the <a href="@disqus">Disqus</a> comment web service.', array('@disqus' => 'http://disqus.com')) .'</p>';
   }
 }
@@ -43,7 +43,7 @@ function disqus_permission() {
  */
 function disqus_menu() {
   $items = array();
-  $items['admin/config/system/disqus'] = array(
+  $items['admin/config/services/disqus'] = array(
     'title' => 'Disqus',
     'description' => 'Provides configuration options for the Disqus comment system.',
     'access arguments' => array('administer disqus'),
@@ -273,6 +273,9 @@ function disqus_block_configure($delta = '') {
     '#type' => 'fieldset',
     '#title' => t('Disqus settings'),
   );
+  if ($delta == 'disqus_comments') {
+    $form['disqus']['#description'] = t('This block will be used to display the comments from Disqus when comments are applied to the given page. Visit the <a href="@disqussettings">Disqus settings</a> to configure when this is visible.', array('@disqussettings' => url('admin/config/services/disqus')));
+  }
   $form['disqus'][$delta . '_items'] = array(
     '#type' => 'select',
     '#title' => t('Number of items to show'),

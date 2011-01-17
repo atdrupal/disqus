@@ -50,23 +50,28 @@ function disqus_admin_settings() {
     '#description' => t('When the comments are displayed in the content area, you can change the position at which they will be shown.'),
     '#default_value' => variable_get('disqus_weight', 50),
     '#options' => drupal_map_assoc(array(-100, -75, -50, -25, 0, 25, 50, 75, 100)),
+    '#states' => array(
+      'visible' => array(
+        'select[name="disqus_location"]' => array('value' => 'content_area'),
+      ),
+    ),
   );
   $form['behavior'] = array(
     '#type' => 'fieldset',
     '#title' => t('Behavior'),
     '#group' => 'settings',
   );
-  $form['behavior']['disqus_developer'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Testing'),
-    '#description' => t('When enabled, uses the <a href="http://disqus.com/help/#faq-14">disqus_developer</a> flag to tell Disqus that you are in a testing environment. Threads will not display on the public community page with this set.'),
-    '#default_value' => variable_get('disqus_developer', FALSE),
-  );
   $form['behavior']['disqus_userapikey'] = array(
     '#type' => 'textfield',
     '#title' => t('User API Key'),
     '#description' => t('The API key of the administrator account on Disqus. You can get yours <a href="@key">here</a>.', array('@key' => 'http://disqus.com/api/get_my_key/')),
     '#default_value' => variable_get('disqus_userapikey', ''),
+  );
+  $form['behavior']['disqus_developer'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Testing'),
+    '#description' => t('When enabled, uses the <a href="http://docs.disqus.com/help/2/">disqus_developer</a> flag to tell Disqus that you are in a testing environment. Threads will not display on the public community page with this set.'),
+    '#default_value' => variable_get('disqus_developer', FALSE),
   );
   return system_settings_form($form);
 }

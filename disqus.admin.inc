@@ -36,12 +36,11 @@ function disqus_admin_settings() {
   $form['visibility']['disqus_location'] = array(
     '#type' => 'select',
     '#title' => t('Location'),
-    '#description' => t('Display the Disqus comments in the given location. When "Block" is selected, the comments will appear in the <a href="@disquscomments">Disqus Comments block</a>. The "Injected Variable" option will provide a variable for precise placement of the comments.', array('@disquscomments' => url('admin/structure/block'))),
+    '#description' => t('Display the Disqus comments in the given location. When "Block" is selected, the comments will appear in the <a href="@disquscomments">Disqus Comments block</a>.', array('@disquscomments' => url('admin/structure/block'))),
     '#default_value' => variable_get('disqus_location', 'content_area'),
     '#options' => array(
       'content_area' => t('Content Area'),
       'block' => t('Block'),
-      'variable' => t('Injected Variable'),
     ),
   );
   $form['visibility']['disqus_weight'] = array(

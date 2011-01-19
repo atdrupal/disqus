@@ -1,4 +1,14 @@
 // $Id$
+
+// The Disqus global variables.
+var disqus_shortname = '';
+var disqus_url = '';
+var disqus_title = '';
+var disqus_identifier = '';
+var disqus_developer = '';
+var disqus_def_name = '';
+var disqus_def_email = '';
+
 (function ($) {
 
 /**
@@ -6,24 +16,36 @@
  */
 Drupal.behaviors.disqus = {
   attach: function (context, settings) {
-    if (settings.disqusCommentDomain || false) {
-      // Create the query.
-      var query = '?';
-      jQuery("a[href$='#disqus_thread']").each(function(i) {
-        query += 'url' + i + '=' + encodeURIComponent($(this).attr('href')) + '&';
-      });
+    $('body').once('disqus', function() {
+      // Load the Disqus comments.
+      if (settings.disqus || false) {
+        disqus_shortname = settings.disqus.domain;
+        disqus_url = settings.disqus.url;
+        disqus_title = settings.disqus.title;
+        disqus_identifier = settings.disqus.identifier;
+        disqus_developer = settings.disqus.developer || 0;
+        disqus_def_name = settings.disqus.name || '';
+        disqus_def_email = settings.disqus.email || '';
+        jQuery.ajax({
+          type: 'GET',
+          url: 'http://' + disqus_shortname + '.disqus.com/embed.js',
+          dataType: 'script',
+          cache: false
+        });
+      }
 
-      // Make sure we are actually processing some links.
-      if (query.length > 2) {
+      // Load the comment numbers JavaScript.
+      if (settings.disqusComments || false) {
+        disqus_shortname = settings.disqusComments;
         // Make the AJAX call to get the number of comments.
         jQuery.ajax({
           type: 'GET',
-          url: 'http://disqus.com/forums/' + settings.disqusCommentDomain + '/get_num_replies.js' + query,
+          url: 'http://' + disqus_shortname + '.disqus.com/count.js',
           dataType: 'script',
-          cache: true
+          cache: false
         });
       }
-    }
+    });
   }
 };
 

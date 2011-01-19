@@ -68,16 +68,36 @@ function disqus_element_info() {
 }
 
 /**
- * Post render function of the Disqus element to inject the footer JavaScript.
+ * Post render function of the Disqus element to inject the Disqus JavaScript.
  */
 function disqus_element_post_render($children, &$element) {
-  // Inject the footer script at the bottom of the page using #attached.
-  $script = theme('disqus_footer', $element);
-  $element['#attached']['js'][] = array(
-    'type' => 'inline',
-    'scope' => 'footer',
-    'weight' => JS_THEME,
-    'data' => $script,
+  // Construct the settings to be passed in for Disqus.
+  $disqus = array(
+    'domain' => $element['#disqus']['domain'],
+    'url' => $element['#disqus']['url'],
+    'title' => $element['#disqus']['title'],
+    'identifier' => $element['#disqus']['identifier'],
+  );
+  if (isset($element['#disqus']['developer']) && $element['#disqus']['developer']) {
+    $disqus['developer'] = 1;
+  }
+
+  // If the user is logged in, we can inject the username and email for Disqus.
+  global $user;
+  if ($user->uid > 0) {
+    $disqus['name'] = $user->name;
+    $disqus['email'] = $user->mail;
+  }
+
+  // Add the disqus.js and all the settings to process the JavaScript and load Disqus.
+  $element['#attached']['js'] = array(
+    drupal_get_path('module', 'disqus') . '/disqus.js' => array(),
+    array(
+      'type' => 'setting',
+      'data' => array(
+        'disqus' => $disqus,
+      ),
+    ),
   );
   return $children;
 }
@@ -107,13 +127,6 @@ function disqus_node_load($nodes, $types) {
           'alias' => TRUE,
           'absolute' => TRUE,
         ));
-
-        // Build the message excerpt.
-        $message = nl2br(''); // @TODO: Pass in the teaser.
-        $message = str_replace("\r", ' ', $message);
-        $message = str_replace("\n", ' ', $message);
-        $message = strip_tags($message);
-        $node->disqus['message'] = check_plain($message);
 
         // Build the title.
         $node->disqus['title'] = check_plain($node->title);
@@ -150,10 +163,6 @@ function disqus_node_view($node, $view_mode) {
 	            '#weight' => variable_get('disqus_weight', 50),
 	          );
       			break;
-      		case 'variable':
-            // Inject it into a variable.
-            $node->disqus_comments = theme('disqus_comments', $node->disqus);
-      		  break;
       	}
         break;
       case 'teaser':
@@ -162,21 +171,31 @@ function disqus_node_view($node, $view_mode) {
           'title' => t('Comments'),
           'href' => 'node/' . $node->nid,
           'fragment' => 'disqus_thread',
+          'attributes' => array(
+            // Identify the node for Disqus with the unique identifier:
+            // http://docs.disqus.com/developers/universal/#comment-count
+            'data-disqus-identifier' => 'node/' . $node->nid,
+          ),
         );
         $node->content['links']['disqus'] = array(
           '#theme' => 'links',
           '#links' => $links,
-          '#attributes' => array('class' => array('links', 'inline')),
+          '#attributes' => array(
+            'class' => array('links', 'inline'),
+          ),
         );
+
+        // Attach disqus.js to load the Disqus comment count JavaScript.
+        $node->content['links']['#attached']['js'][] = drupal_get_path('module', 'disqus') . '/disqus.js';
+
+        // Add the disqusComments setting.
         static $added = FALSE;
         if ($added == FALSE) {
           drupal_add_js(array(
-            'disqusCommentDomain' => $node->disqus['domain'],
+            'disqusComments' => $node->disqus['domain'],
           ), 'setting');
           $added = TRUE;
         }
-        $js = drupal_get_path('module', 'disqus') . '/disqus.js';
-        $node->content['links']['disqus']['#attached']['js'][$js] = array();
         break;
     }
   }
@@ -228,13 +247,10 @@ function disqus_user_load($users) {
         $account->disqus = array('domain' => $domain);
 
         // Build the absolute URL without the alias for the disqus_url flag.
-        $account->disqus['url'] = url("user/$account->uid", array(
+        $account->disqus['url'] = url('user/' . $account->uid, array(
           'alias' => TRUE,
           'absolute' => TRUE,
         ));
-
-        // Build the message excerpt.
-        $account->disqus['message'] = check_plain($account->name);
 
         // Build the title.
         $account->disqus['title'] = check_plain($account->name);
@@ -254,8 +270,8 @@ function disqus_user_load($users) {
 /**
  * Implements hook_user_view().
  */
-function disqus_user_view($account, $view_mode) {
-  if (isset($account->disqus) && $view_mode == 'full' && user_access('view disqus comments')) {
+function disqus_user_view($account, $view_mode, $langcode) {
+  if (isset($account->disqus) && $view_mode == 'full') {
     // Inject Disqus into the user object.
     switch (variable_get('disqus_location', 'content_area')) {
       case 'content_area':
@@ -263,11 +279,8 @@ function disqus_user_view($account, $view_mode) {
           '#type' => 'disqus',
           '#disqus' => $account->disqus,
           '#weight' => variable_get('disqus_weight', 50),
+          '#access' => user_access('view disqus comments'),
         );
-        break;
-      case 'variable':
-        // Inject it into a variable.
-        $account->disqus_comments = theme('disqus_comments', $account->disqus);
         break;
     }
   }
@@ -448,25 +461,30 @@ EOT;
     break;
     case 'disqus_comments':
       if ((variable_get('disqus_location', 'content_area') == 'block') && user_access('view disqus comments')) {
+        // Check what the user is currently looking at from the menu router.
         $item = menu_get_item();
-        switch ($item['path']) {
-          case 'node/%':
-            if ($disqus = isset($item['page_arguments'][0]->disqus) ? $item['page_arguments'][0]->disqus : FALSE) {
-              $content['disqus'] = array(
-                '#type' => 'disqus',
-                '#disqus' => $disqus,
-              );
-            }
-            break;
-          case 'user/%':
-            // @TODO: Fix the user menu router.
-            if ($disqus = isset($item['page_arguments'][0]->disqus) ? $item['page_arguments'][0]->disqus : FALSE) {
-              $content['disqus'] = array(
-                '#type' => 'disqus',
-                '#disqus' => $disqus,
-              );
-            }
-            break;
+        // Retrieve the object from the menu router, if it exists.
+        if ($object = isset($item['page_arguments'][0]) ? $item['page_arguments'][0] : FALSE) {
+          switch ($item['path']) {
+            case 'node/%':
+              // For nodes, display if the Disqus object is enabled.
+              if (isset($object->disqus) && $object->disqus['status']) {
+                $content['disqus'] = array(
+                  '#type' => 'disqus',
+                  '#disqus' => $object->disqus,
+                );
+              }
+              break;
+            case 'user/%':
+              // For users, display if the Disqus object exists.
+              if (isset($object->disqus)) {
+                $content['disqus'] = array(
+                  '#type' => 'disqus',
+                  '#disqus' => $object->disqus,
+                );
+              }
+              break;
+          }
         }
       }
       break;
@@ -500,7 +518,8 @@ function disqus_form_alter(&$form, $form_state, $form_id) {
       }
       $form['comment_settings']['disqus_status'] = array(
         '#type' => 'checkbox',
-        '#title' => t('Enable Disqus comments'),
+        '#title' => t('Disqus comments'),
+        '#description' => t('Users can post comments using <a href="@disqus">Disqus</a>.', array('@disqus' => 'http://disqus.com')),
         '#default_value' => isset($node->disqus['status']) ? $node->disqus['status'] : TRUE,
       );
     }
@@ -512,9 +531,6 @@ function disqus_form_alter(&$form, $form_state, $form_id) {
  */
 function disqus_theme() {
   return array(
-    'disqus_footer' => array(
-      'variables' => array('disqus' => NULL),
-    ),
     'disqus_noscript' => array(
       'variables' => array('disqus' => NULL),
     ),
@@ -528,7 +544,6 @@ function disqus_theme() {
  *   An array containing a "disqus" array, containing the following items:
  *     - "domain": The domain associated with this Disqus account.
  *     - "title": The title of the thread.
- *     - "message": The teaser of the thread.
  *     - "developer": Whether or not testing is enabled.
  *     - "url": The disqus_url variable (http://disqus.com/docs/help/#faq-16).
  */
@@ -536,39 +551,6 @@ function theme_disqus_noscript($variables = array()) {
   $disqus = $variables['disqus'];
   // Return the comment markup.
   return '<noscript><p>' . l(t('View the discussion thread.'), 'http://' . $disqus['domain'] . '.disqus.com/?url=' . urlencode($disqus['url'])) . '</p></noscript>';
-}
-
-/**
- * Renders the Disqus JavaScript that appears at the bottom of the page.
- *
- * @param $variables
- *   An associative array containing a "disqus" array with the values:
- *     - "domain": The domain associated with this Disqus account.
- *     - "title": The title of the thread.
- *     - "message": The teaser of the thread.
- *     - "developer": Whether or not testing is enabled.
- *     - "url": The disqus_url variable (http://disqus.com/docs/help/#faq-16).
- *
- * @return
- *   A string representing the JavaScript that appears at the bottom of the page.
- */
-function theme_disqus_footer($variables = array()) {
-  $disqus = $variables['disqus'];
-  $output = 'var disqus_url = '. drupal_json_encode($disqus['url']) .';';
-  $output .= 'var disqus_title = '. drupal_json_encode($disqus['title']) .';';
-  $output .= 'var disqus_message = '. drupal_json_encode($disqus['message']) .';';
-  $output .= 'var disqus_identifier = '. drupal_json_encode($disqus['identifier']) .';';
-  if (isset($disqus['developer'])) {
-    $output .= 'var disqus_developer = 1;';
-  }
-  // For logged in users, inject the name and email address for the textfields.
-  global $user;
-  if ($user->uid > 0) {
-    $output .= 'var disqus_def_name = '. drupal_json_encode($user->name) .';';
-    $output .= 'var disqus_def_email = '. drupal_json_encode($user->mail) .';';
-  }
-  $output .= 'jQuery.getScript("http://disqus.com/forums/' . $disqus['domain'] . '/embed.js");';
-  return $output;
 }
 
 /**

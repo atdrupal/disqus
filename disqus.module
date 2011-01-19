@@ -485,7 +485,7 @@ function disqus_form_alter(&$form, $form_state, $form_id) {
     // Only display the toggle Disqus comments setting if comments are available
     // for the given node type.
     $types = variable_get('disqus_nodetypes', array());
-    if (!empty($types[$node->type])) {
+    if (isset($types[$node->type]) && !empty($types[$node->type])) {
       // Add the Disqus settings into the Comment settings fieldset if it exists.
       if (!isset($form['comment_settings'])) {
         $form['comment_settings'] = array(

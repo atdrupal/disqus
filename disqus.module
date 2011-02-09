@@ -147,7 +147,6 @@ function disqus_node_load($nodes, $types) {
         elseif ($developer = variable_get('disqus_developer', FALSE)) {
           $node->disqus['developer'] = intval($developer);
         }
-        dsm($node);
       }
     }
   }

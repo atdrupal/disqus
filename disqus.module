@@ -89,6 +89,12 @@ function disqus_element_post_render($children, &$element) {
     $disqus['email'] = $user->mail;
   }
 
+  // Provide alternate language support if desired.
+  if (variable_get('disqus_localization', FALSE)) {
+    global $language;
+    $disqus['language'] = $language->language;
+  }
+
   // Add the disqus.js and all the settings to process the JavaScript and load Disqus.
   $element['#attached']['js'] = array(
     drupal_get_path('module', 'disqus') . '/disqus.js' => array(),
@@ -141,6 +147,7 @@ function disqus_node_load($nodes, $types) {
         elseif ($developer = variable_get('disqus_developer', FALSE)) {
           $node->disqus['developer'] = intval($developer);
         }
+        dsm($node);
       }
     }
   }

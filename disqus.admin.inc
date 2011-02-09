@@ -66,6 +66,12 @@ function disqus_admin_settings() {
     '#description' => t('The API key of the administrator account on Disqus. You can get yours <a href="@key">here</a>.', array('@key' => 'http://disqus.com/api/get_my_key/')),
     '#default_value' => variable_get('disqus_userapikey', ''),
   );
+  $form['behavior']['disqus_localization'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Localization support'),
+    '#description' => t("When enabled, overrides the language set by Disqus with the language provided by the site."),
+    '#default_value' => variable_get('disqus_localization', FALSE),
+  );
   $form['behavior']['disqus_developer'] = array(
     '#type' => 'checkbox',
     '#title' => t('Testing'),

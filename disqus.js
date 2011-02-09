@@ -8,6 +8,7 @@ var disqus_identifier = '';
 var disqus_developer = '';
 var disqus_def_name = '';
 var disqus_def_email = '';
+var disqus_config;
 
 (function ($) {
 
@@ -19,6 +20,7 @@ Drupal.behaviors.disqus = {
     $('body').once('disqus', function() {
       // Load the Disqus comments.
       if (settings.disqus || false) {
+        // Setup the global JavaScript variables for Disqus.
         disqus_shortname = settings.disqus.domain;
         disqus_url = settings.disqus.url;
         disqus_title = settings.disqus.title;
@@ -26,6 +28,13 @@ Drupal.behaviors.disqus = {
         disqus_developer = settings.disqus.developer || 0;
         disqus_def_name = settings.disqus.name || '';
         disqus_def_email = settings.disqus.email || '';
+        if (settings.disqus.language || false) {
+          disqus_config = function() {
+            this.language = settings.disqus.language;
+          };
+        }
+
+        // Make the AJAX call to get the Disqus comments.
         jQuery.ajax({
           type: 'GET',
           url: 'http://' + disqus_shortname + '.disqus.com/embed.js',

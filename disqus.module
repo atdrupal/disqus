@@ -222,7 +222,7 @@ function disqus_node_insert($node) {
   disqus_node_delete($node);
 
   // Write the value only if it's disabled (default is enabled).
-  if ($node->disqus_status == FALSE) {
+  if (isset($node->disqus_status) && $node->disqus_status == FALSE) {
     $data = array(
       'nid' => $node->nid,
       'status' => $node->disqus_status,

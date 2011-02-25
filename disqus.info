@@ -1,4 +1,3 @@
-; $Id$
 name = Disqus
 description = Uses the Disqus web service to enhance comments.
 core = 7.x

@@ -1,4 +1,3 @@
-// $Id$
 
 // The Disqus global variables.
 var disqus_shortname = '';

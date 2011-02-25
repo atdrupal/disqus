@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Menu callback; Displays the administration settings for Disqus.

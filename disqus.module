@@ -1,4 +1,7 @@
 <?php
+/**
+ * The Disqus Drupal module.
+ */
 
 /**
  * Implement hook_help().

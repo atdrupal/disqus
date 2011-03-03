@@ -1,3 +1,7 @@
+/**
+ * @file
+ * JavaScript for the Disqus Drupal module.
+ */
 
 // The Disqus global variables.
 var disqus_shortname = '';

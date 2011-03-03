@@ -1,4 +1,7 @@
 <?php
+/**
+ * Administration forms for the Disqus module.
+ */
 
 /**
  * Menu callback; Displays the administration settings for Disqus.

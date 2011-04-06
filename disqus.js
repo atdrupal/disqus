@@ -8,7 +8,7 @@ var disqus_shortname = '';
 var disqus_url = '';
 var disqus_title = '';
 var disqus_identifier = '';
-var disqus_developer = '';
+var disqus_developer = 0;
 var disqus_def_name = '';
 var disqus_def_email = '';
 var disqus_config;
@@ -31,11 +31,22 @@ Drupal.behaviors.disqus = {
         disqus_developer = settings.disqus.developer || 0;
         disqus_def_name = settings.disqus.name || '';
         disqus_def_email = settings.disqus.email || '';
-        if (settings.disqus.language || false) {
-          disqus_config = function() {
+
+        // Language and SSO settings are passed in through disqus_config().
+        disqus_config = function() {
+          if (settings.disqus.language || false) {
             this.language = settings.disqus.language;
-          };
-        }
+          }
+          if (settings.disqus.remote_auth_s3 || false) {
+            this.page.remote_auth_s3 = settings.disqus.remote_auth_s3;
+          }
+          if (settings.disqus.api_key || false) {
+            this.page.api_key = settings.disqus.api_key;
+          }
+          if (settings.disqus.sso || false) {
+            this.sso = settings.disqus.sso;
+          }
+        };
 
         // Make the AJAX call to get the Disqus comments.
         jQuery.ajax({

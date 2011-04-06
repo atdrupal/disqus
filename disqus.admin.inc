@@ -18,6 +18,7 @@ function disqus_admin_settings() {
     '#type' => 'vertical_tabs',
     '#weight' => 50,
   );
+  // Visibility settings.
   $form['visibility'] = array(
     '#type' => 'fieldset',
     '#title' => t('Visibility'),
@@ -57,6 +58,7 @@ function disqus_admin_settings() {
       ),
     ),
   );
+  // Behavior settings.
   $form['behavior'] = array(
     '#type' => 'fieldset',
     '#title' => t('Behavior'),
@@ -80,5 +82,46 @@ function disqus_admin_settings() {
     '#description' => t('When enabled, uses the <a href="http://docs.disqus.com/help/2/">disqus_developer</a> flag to tell Disqus that you are in a testing environment. Threads will not display on the public community page with this set.'),
     '#default_value' => variable_get('disqus_developer', FALSE),
   );
+  // Advanced settings.
+  $form['advanced'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Advanced'),
+    '#group' => 'settings',
+    '#description' => t('Use these settings to configure the more advanced uses of Disqus. You can find more information about these in the <a href="@applications">Applications</a> section of Disqus.', array(
+      '@applications' => 'http://disqus.com/api/applications/',
+    )),
+  );
+  $form['advanced']['disqus_publickey'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Public Key'),
+    '#default_value' => variable_get('disqus_publickey', ''),
+  );
+  $form['advanced']['disqus_secretkey'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Secret Key'),
+    '#default_value' => variable_get('disqus_secretkey', ''),
+  );
+  $form['advanced']['disqus_sso'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Single Sign-On'),
+    '#description' => t('Provide <a href="@sso">Single Sign-On</a> access to your site.', array(
+      '@sso' => 'http://disqus.com/api/sso/',
+    )),
+    '#default_value' => variable_get('disqus_sso', FALSE),
+    '#states' => array(
+      'visible' => array(
+        'input[name="disqus_publickey"]' => array('empty' => FALSE),
+        'input[name="disqus_secretkey"]' => array('empty' => FALSE),
+      ),
+    ),
+  );
   return system_settings_form($form);
+}
+
+/**
+ * Menu callback; Automatically closes the window after the user logs in.
+ */
+function disqus_closewindow() {
+  drupal_add_js('window.close();', 'inline');
+  return t('Thank you for logging in. Please close this window, or <a href="@clickhere">click here</a> to continue.', array('@clickhere' => 'javascript:window.close();'));
 }

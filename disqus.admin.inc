@@ -76,6 +76,12 @@ function disqus_admin_settings() {
     '#description' => t("When enabled, overrides the language set by Disqus with the language provided by the site."),
     '#default_value' => variable_get('disqus_localization', FALSE),
   );
+  $form['behavior']['disqus_inherit_login'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Inherit User Credentials'),
+    '#description' => t("When enabled and a user is logged in, the Disqus 'Post as Guest' login form will be pre-filled with the user's name and email address."),
+    '#default_value' => variable_get('disqus_inherit_login', TRUE),
+  );
   $form['behavior']['disqus_developer'] = array(
     '#type' => 'checkbox',
     '#title' => t('Testing'),

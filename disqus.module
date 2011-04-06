@@ -94,7 +94,7 @@ function disqus_element_post_render($children, &$element) {
 
   // If the user is logged in, we can inject the username and email for Disqus.
   global $user;
-  if ($user->uid > 0) {
+  if (variable_get('disqus_inherit_login', TRUE) && $user->uid > 0) {
     $disqus['name'] = $user->name;
     $disqus['email'] = $user->mail;
   }

@@ -56,7 +56,7 @@ function disqus_menu() {
   $items['disqus/closewindow'] = array(
     'title' => 'Please wait',
     'description' => 'Once the user logs in through the Disqus login workflow, they are redirected here to automatically close the popup window.',
-    'access arguments' => array('access content'),
+    'access arguments' => array('view disqus comments'),
     'page callback' => 'disqus_closewindow',
     'file' => 'disqus.admin.inc',
     'type' => MENU_CALLBACK,

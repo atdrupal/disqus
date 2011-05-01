@@ -1,5 +1,7 @@
 <?php
+
 /**
+ * @file
  * Administration forms for the Disqus module.
  */
 

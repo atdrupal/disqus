@@ -7,5 +7,6 @@ files[] = disqus.admin.inc
 files[] = disqus.install
 files[] = disqus.module
 files[] = disqus.php
+files[] = disqus.views.inc
 
 configure = admin/config/services/disqus

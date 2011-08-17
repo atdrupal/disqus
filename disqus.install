@@ -57,5 +57,8 @@ function disqus_update_7000() {
  * Updates Disqus with support for toggling comments per node.
  */
 function disqus_update_7001() {
-  drupal_install_schema('disqus');
+  if (!db_table_exists('disqus')) {
+    drupal_install_schema('disqus');
+  }
 }
+

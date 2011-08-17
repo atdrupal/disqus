@@ -23,7 +23,7 @@ function disqus_views_data_alter(&$data) {
  * Field handler to present the number of Disqus comments on a node.
  */
 class views_handler_field_node_disqus_comment_count extends views_handler_field {
-  function init(&$view, $options) {
+  function init(&$view, &$options) {
     parent::init($view, $options);
   }
 

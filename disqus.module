@@ -116,7 +116,9 @@ function disqus_element_post_render($children, &$element) {
       $data['id'] = $user->uid;
       $data['username'] = $user->name;
       $data['email'] = $user->mail;
-      $data['url'] = url('user/' . $user->uid, array('absolute' => TRUE));
+      $data['url'] = url('user/' . $user->uid, array(
+        'absolute' => TRUE,
+      ));
 
       // Load the user's avatar.
       $user_picture_default = variable_get('user_picture_default', '');
@@ -196,7 +198,6 @@ function disqus_node_load($nodes, $types) {
 
         // Build the absolute URL without the alias for the disqus_url flag.
         $node->disqus['url'] = url("node/$node->nid", array(
-          'alias' => TRUE,
           'absolute' => TRUE,
         ));
 
@@ -315,7 +316,6 @@ function disqus_user_load($users) {
 
         // Build the absolute URL without the alias for the disqus_url flag.
         $account->disqus['url'] = url('user/' . $account->uid, array(
-          'alias' => TRUE,
           'absolute' => TRUE,
         ));
 

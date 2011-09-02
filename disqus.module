@@ -39,6 +39,10 @@ function disqus_permission() {
       'title' => t('Disqus comments in profile'),
       'description' => t('When enabled, will display Disqus comments on the profiles of users belonging to this role.'),
     ),
+    'toggle disqus comments' => array(
+      'title' => t('Toggle Disqus comments'),
+      'description' => t('When enabled, will allow users to toggle comments on and off on nodes.'),
+    ),
   );
 }
 
@@ -575,7 +579,7 @@ function disqus_form_alter(&$form, $form_state, $form_id) {
       if (!isset($form['comment_settings'])) {
         $form['comment_settings'] = array(
           '#type' => 'fieldset',
-          '#access' => user_access('view disqus comments'),
+          '#access' => user_access('toggle disqus comments'),
           '#title' => t('Comment settings'),
           '#collapsible' => TRUE,
           '#collapsed' => TRUE,
@@ -583,11 +587,18 @@ function disqus_form_alter(&$form, $form_state, $form_id) {
           '#weight' => 30,
         );
       }
+      else {
+        if (isset($form['comment_settings']['comment'])) {
+          $form['comment_settings']['comment']['#access'] = $form['comment_settings']['#access'];
+          $form['comment_settings']['#access'] = true;
+        }
+      }
       $form['comment_settings']['disqus_status'] = array(
         '#type' => 'checkbox',
         '#title' => t('Disqus comments'),
         '#description' => t('Users can post comments using <a href="@disqus">Disqus</a>.', array('@disqus' => 'http://disqus.com')),
         '#default_value' => isset($node->disqus['status']) ? $node->disqus['status'] : TRUE,
+        '#access' => user_access('toggle disqus comments'),
       );
     }
   }

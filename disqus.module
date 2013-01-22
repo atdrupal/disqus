@@ -575,7 +575,8 @@ function disqus_form_alter(&$form, $form_state, $form_id) {
     // for the given node type.
     $types = variable_get('disqus_nodetypes', array());
     if (isset($types[$node->type]) && !empty($types[$node->type])) {
-      // Add the Disqus settings into the Comment settings fieldset if it exists.
+      // Add a comment settings fieldset for users with "toggle disqus comments" permission
+      // when Drupal core Comments module is disabled.
       if (!isset($form['comment_settings'])) {
         $form['comment_settings'] = array(
           '#type' => 'fieldset',
@@ -589,10 +590,13 @@ function disqus_form_alter(&$form, $form_state, $form_id) {
       }
       else {
         if (isset($form['comment_settings']['comment'])) {
+          // Ensure only core Comment administrators see Comment module settings
           $form['comment_settings']['comment']['#access'] = $form['comment_settings']['#access'];
-          $form['comment_settings']['#access'] = true;
+          // But reveal parent comment settings fieldset if user has toggle permission
+          $form['comment_settings']['#access'] = user_access('toggle disqus comments');
         }
       }
+      // Add the Disqus settings into the comment settings fieldset for users with toggle permission.
       $form['comment_settings']['disqus_status'] = array(
         '#type' => 'checkbox',
         '#title' => t('Disqus comments'),

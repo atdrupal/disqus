@@ -206,7 +206,7 @@ function disqus_node_load($nodes, $types) {
         ));
 
         // Build the title.
-        $node->disqus['title'] = check_plain($node->title);
+        $node->disqus['title'] = check_plain(strip_tags($node->title));
 
         // Provide the identifier.
         $node->disqus['identifier'] = 'node/' . $node->nid;
@@ -230,17 +230,17 @@ function disqus_node_view($node, $view_mode) {
   if (isset($node->disqus) && user_access('view disqus comments') && $node->disqus['status'] == 1) {
     switch ($view_mode) {
       case 'full':
-      	// Inject Disqus into the node object.
-      	switch (variable_get('disqus_location', 'content_area')) {
-      		case 'content_area':
-	          // Inject into the node content.
-	          $node->content['disqus'] = array(
-	            '#type' => 'disqus',
-	            '#disqus' => $node->disqus,
-	            '#weight' => variable_get('disqus_weight', 50),
-	          );
-      			break;
-      	}
+        // Inject Disqus into the node object.
+        switch (variable_get('disqus_location', 'content_area')) {
+          case 'content_area':
+            // Inject into the node content.
+            $node->content['disqus'] = array(
+              '#type' => 'disqus',
+              '#disqus' => $node->disqus,
+              '#weight' => variable_get('disqus_weight', 50),
+            );
+            break;
+        }
         break;
       case 'teaser':
         // Display the Disqus link.
@@ -324,7 +324,7 @@ function disqus_user_load($users) {
         ));
 
         // Build the title.
-        $account->disqus['title'] = check_plain($account->name);
+        $account->disqus['title'] = check_plain(strip_tags($account->name));
 
         // Provide the identifier.
         $account->disqus['identifier'] = 'user/' . $account->uid;

@@ -126,11 +126,3 @@ function disqus_admin_settings() {
   );
   return system_settings_form($form);
 }
-
-/**
- * Menu callback; Automatically closes the window after the user logs in.
- */
-function disqus_closewindow() {
-  drupal_add_js('window.close();', 'inline');
-  return t('Thank you for logging in. Please close this window, or <a href="@clickhere">click here</a> to continue.', array('@clickhere' => 'javascript:window.close();'));
-}

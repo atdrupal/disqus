@@ -71,6 +71,14 @@ function disqus_menu() {
 }
 
 /**
+ * Menu callback; Automatically closes the window after the user logs in.
+ */
+function disqus_closewindow() {
+  drupal_add_js('window.close();', 'inline');
+  return t('Thank you for logging in. Please close this window, or <a href="@clickhere">click here</a> to continue.', array('@clickhere' => 'javascript:window.close();'));
+}
+
+/**
  * Implements hook_element_info().
  */
 function disqus_element_info() {
@@ -657,4 +665,3 @@ function disqus($user_api_key = NULL, $forum_api_key = NULL) {
 function disqus_views_api() {
   return array('api' => 3);
 }
-

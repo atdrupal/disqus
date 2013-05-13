@@ -15,7 +15,7 @@ function disqus_schema() {
       'did' => array(
         'type' => 'serial',
         'not null' => TRUE,
-      ),  
+      ),
       'nid' => array(
         'type' => 'int',
         'not null' => TRUE,
@@ -44,6 +44,7 @@ function disqus_schema() {
 function disqus_uninstall() {
   // Remove all Disqus-related variables.
   db_delete('variable')->condition('name', 'disqus_%', 'LIKE')->execute();
+  cache_clear_all('variables', 'cache_bootstrap');
 }
 
 /**
@@ -61,4 +62,3 @@ function disqus_update_7001() {
     drupal_install_schema('disqus');
   }
 }
-

@@ -574,7 +574,6 @@ function disqus_block_view($delta = '') {
                 'query' => array(
                   'num_items' => $num_items,
                   'hide_mods' => $hide_mods,
-                  'excerpt_length' => $excerpt_length,
                 ) + $avatars,
               ),
             ),

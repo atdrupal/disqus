@@ -292,9 +292,6 @@ function disqus_node_delete($node) {
  * Implements hook_node_insert().
  */
 function disqus_node_insert($node) {
-  // Clear the value from the database.
-  disqus_node_delete($node);
-
   // Write the value only if it's disabled (default is enabled).
   if (isset($node->disqus_status) && $node->disqus_status == FALSE) {
     $data = array(
@@ -309,8 +306,14 @@ function disqus_node_insert($node) {
  * Implements hook_node_update().
  */
 function disqus_node_update($node) {
-  // Update is the same as insert.
-  disqus_node_insert($node);
+  if (isset($node->disqus_status) && $node->disqus_status != $node->original->disqus_status) {
+    if ($node->disqus_status) {
+      disqus_node_insert($node);
+    }
+    else {
+      disqus_node_delete($node);
+    }
+  }
 }
 
 /**

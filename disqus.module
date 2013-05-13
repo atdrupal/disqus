@@ -520,91 +520,103 @@ function disqus_block_view($delta = '') {
       case 'disqus_recent_comments':
         $subject = t('Recent Comments');
         $content = array(
-          '#theme' => 'html_tag',
-          '#tag' => 'script',
-          '#attributes' => array(
-            'type' => 'text/javascript',
-            'src' => url(
-              "http://disqus.com/forums/$domain/recent_comments_widget.js",
-              array(
-                'external' => TRUE,
-                'query' => array(
-                  'num_items' => $num_items,
-                  'excerpt_length' => $excerpt_length,
-                ) + $avatars,
-              )
+          'widget' => array(
+            '#theme' => 'html_tag',
+            '#tag' => 'script',
+            '#value' => '',
+            '#attributes' => array(
+              'type' => 'text/javascript',
+              'src' => url(
+                "http://disqus.com/forums/$domain/recent_comments_widget.js",
+                array(
+                  'external' => TRUE,
+                  'query' => array(
+                    'num_items' => $num_items,
+                    'excerpt_length' => $excerpt_length,
+                  ) + $avatars,
+                )
+              ),
             ),
+            '#prefix' => '<div id="dsq-recentcomments" class="dsq-widget">',
+            '#suffix' => '</div>',
           ),
-          '#prefix' => '<div id="dsq-recentcomments" class="dsq-widget">',
-          '#suffix' => '</div>',
         );
         break;
       case 'disqus_popular_threads':
         $subject = t('Popular Threads');
         $content = array(
-          '#theme' => 'html_tag',
-          '#tag' => 'script',
-          '#attributes' => array(
-            'type' => 'text/javascript',
-            'src' => url(
-              "http://disqus.com/forums/$domain/popular_threads_widget.js",
-              array(
-                'external' => TRUE,
-                'query' => array(
-                  'num_items' => $num_items,
-                ),
-              )
+          'widget' => array(
+            '#theme' => 'html_tag',
+            '#tag' => 'script',
+            '#value' => '',
+            '#attributes' => array(
+              'type' => 'text/javascript',
+              'src' => url(
+                "http://disqus.com/forums/$domain/popular_threads_widget.js",
+                array(
+                  'external' => TRUE,
+                  'query' => array(
+                    'num_items' => $num_items,
+                  ),
+                )
+              ),
             ),
+            '#prefix' => '<div id="dsq-popthreads" class="dsq-widget">',
+            '#suffix' => '</div>',
           ),
-          '#prefix' => '<div id="dsq-popthreads" class="dsq-widget">',
-          '#suffix' => '</div>',
         );
         break;
       case 'disqus_top_commenters':
         $subject = t('Top Commenters');
         $content = array(
-          '#theme' => 'html_tag',
-          '#tag' => 'script',
-          '#attributes' => array(
-            'type' => 'text/javascript',
-            'src' => url(
-              "http://disqus.com/forums/$domain/top_commenters_widget.js",
-              array(
-                'external' => TRUE,
-                'query' => array(
-                  'num_items' => $num_items,
-                  'hide_mods' => $hide_mods,
-                ) + $avatars,
-              )
+          'widget' => array(
+            '#theme' => 'html_tag',
+            '#tag' => 'script',
+            '#value' => '',
+            '#attributes' => array(
+              'type' => 'text/javascript',
+              'src' => url(
+                "http://disqus.com/forums/$domain/top_commenters_widget.js",
+                array(
+                  'external' => TRUE,
+                  'query' => array(
+                    'num_items' => $num_items,
+                    'hide_mods' => $hide_mods,
+                  ) + $avatars,
+                )
+              ),
             ),
-          ),
-          '#prefix' => '<div id="dsq-topcommenters" class="dsq-widget">',
+            '#prefix' => '<div id="dsq-topcommenters" class="dsq-widget">',
           '#suffix' => '</div>',
+          ),
         );
         break;
       case 'disqus_combination_widget':
         $subject = t('Comments');
         $content = array(
-          '#theme' => 'html_tag',
-          '#tag' => 'script',
-          '#attributes' => array(
-            'type' => 'text/javascript',
-            'src' => url(
-              "http://disqus.com/forums/$domain/combination_widget.js",
-              array(
-                'external' => TRUE,
-                'query' => array(
-                  'num_items' => $num_items,
-                  'hide_mods' => $hide_mods,
-                  'excerpt_length' => $excerpt_length,
-                  'color' => $color,
-                  'default_tab' => $default_tab,
-                ),
-              )
+          'widget' => array(
+            '#theme' => 'html_tag',
+            '#tag' => 'script',
+            '#value' => '',
+            '#attributes' => array(
+              'type' => 'text/javascript',
+              'src' => url(
+                "http://disqus.com/forums/$domain/combination_widget.js",
+                array(
+                  'external' => TRUE,
+                  'query' => array(
+                    'num_items' => $num_items,
+                    'hide_mods' => $hide_mods,
+                    'excerpt_length' => $excerpt_length,
+                    'color' => $color,
+                    'default_tab' => $default_tab,
+                  ),
+                )
+              ),
             ),
+            '#prefix' => '<div id="dsq-recentcomments" class="dsq-widget">',
+            '#suffix' => '</div>',
           ),
-          '#prefix' => '<div id="dsq-recentcomments" class="dsq-widget">',
-          '#suffix' => '</div>',
         );
         break;
       case 'disqus_comments':

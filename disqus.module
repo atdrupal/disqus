@@ -390,7 +390,7 @@ function disqus_block_info() {
   );
   $blocks['disqus_comments'] = array(
     'info' => t('Disqus: Comments'),
-    'cache' => DRUPAL_NO_CACHE,
+    'cache' => DRUPAL_CACHE_PER_PAGE,
   );
   return $blocks;
 }

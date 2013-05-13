@@ -306,12 +306,12 @@ function disqus_node_insert($node) {
  * Implements hook_node_update().
  */
 function disqus_node_update($node) {
-  if (isset($node->disqus_status) && $node->disqus_status != $node->original->disqus_status) {
+  if (isset($node->disqus_status) && isset($node->disqus['status']) && $node->disqus_status != $node->disqus['status']) {
     if ($node->disqus_status) {
-      disqus_node_insert($node);
+      disqus_node_delete($node);
     }
     else {
-      disqus_node_delete($node);
+      disqus_node_insert($node);
     }
   }
 }

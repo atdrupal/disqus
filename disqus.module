@@ -64,7 +64,6 @@ function disqus_menu() {
     'description' => 'Once the user logs in through the Disqus login workflow, they are redirected here to automatically close the popup window.',
     'access arguments' => array('access content'),
     'page callback' => 'disqus_closewindow',
-    'file' => 'disqus.admin.inc',
     'type' => MENU_CALLBACK,
   );
   return $items;

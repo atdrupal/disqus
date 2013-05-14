@@ -539,12 +539,7 @@ function disqus_block_view($delta = '') {
         break;
       case 'disqus_comments':
         if (variable_get('disqus_location', 'content_area') == 'block' && user_access('view disqus comments')) {
-          // Check what the user is currently looking at from the menu router.
-          $item = menu_get_item();
-          // Retrieve the object from the menu router, if it exists.
-          if ($object = isset($item['page_arguments'][0]) ? $item['page_arguments'][0] : FALSE) {
-            switch ($item['path']) {
-              case 'node/%':
+          if ($object = menu_get_object()) {
                 // For nodes, display if the Disqus object is enabled.
                 if (isset($object->disqus) && $object->disqus['status']) {
                   $content['disqus'] = array(
@@ -552,17 +547,14 @@ function disqus_block_view($delta = '') {
                     '#disqus' => $object->disqus,
                   );
                 }
-                break;
-              case 'user/%':
-                // For users, display if the Disqus object exists.
+          }
+          else if ($object = menu_get_object('user')) {
                 if (isset($object->disqus)) {
                   $content['disqus'] = array(
                     '#type' => 'disqus',
                     '#disqus' => $object->disqus,
                   );
                 }
-                break;
-            }
           }
         }
         break;

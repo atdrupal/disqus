@@ -177,6 +177,25 @@ function disqus_element_post_render($children, &$element) {
     $disqus['api_key'] = variable_get('disqus_publickey', '');
   }
 
+  /**
+   * Pass callbacks on if needed. Callbacks array is two dimensional array
+   * with callback type as key on first level and array of JS callbacks on the
+   * second level.
+   *
+   * Example:
+   * @code
+   * $element['#disqus']['callbacks'] = array(
+   *   'onNewComment' => array(
+   *     'myCallbackThatFiresOnCommentPost',
+   *     'Drupal.mymodule.anotherCallbInsideDrupalObj',
+   *   ),
+   * );
+   * @endcode
+   */
+  if (!empty($element['#disqus']['callbacks'])) {
+    $disqus['callbacks'] = $element['#disqus']['callbacks'];
+  }
+
   // Add the disqus.js and all the settings to process the JavaScript and load Disqus.
   $element['#attached']['js'] = array(
     drupal_get_path('module', 'disqus') . '/disqus.js' => array(),

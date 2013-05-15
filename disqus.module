@@ -411,7 +411,7 @@ function disqus_block_info() {
   );
   $blocks['disqus_comments'] = array(
     'info' => t('Disqus: Comments'),
-    'cache' => DRUPAL_CACHE_PER_PAGE,
+    'cache' => DRUPAL_CACHE_CUSTOM,
   );
   return $blocks;
 }
@@ -557,23 +557,46 @@ function disqus_block_view($delta = '') {
         $content = _disqus_block_content('combination_widget', $options);
         break;
       case 'disqus_comments':
-        if (variable_get('disqus_location', 'content_area') == 'block' && user_access('view disqus comments')) {
+        $display = variable_get('disqus_location', 'content_area') == 'block' && user_access('view disqus comments');
+        if ($display) {
           if ($object = menu_get_object()) {
-                // For nodes, display if the Disqus object is enabled.
-                if (isset($object->disqus) && $object->disqus['status']) {
-                  $content['disqus'] = array(
-                    '#type' => 'disqus',
-                    '#disqus' => $object->disqus,
-                  );
-                }
+            // For nodes, display if the Disqus object is enabled.
+            if (isset($object->disqus) && $object->disqus['status']) {
+              $content = array(
+                'disqus' => array(
+                  '#type' => 'disqus',
+                  '#disqus' => $object->disqus,
+                ),
+                '#cache' => array(
+                  'bin' => 'cache_block',
+                  'expire' => CACHE_TEMPORARY,
+                  'keys' => array(
+                    'node',
+                    (int) $object->nid,
+                    (int) $display,
+                  ),
+                ),
+              );
+            }
           }
           else if ($object = menu_get_object('user')) {
-                if (isset($object->disqus)) {
-                  $content['disqus'] = array(
-                    '#type' => 'disqus',
-                    '#disqus' => $object->disqus,
-                  );
-                }
+            if (isset($object->disqus)) {
+              $content = array(
+                'disqus' => array(
+                  '#type' => 'disqus',
+                  '#disqus' => $object->disqus,
+                ),
+                '#cache' => array(
+                  'bin' => 'cache_block',
+                  'expire' => CACHE_TEMPORARY,
+                  'keys' => array(
+                    'user',
+                    (int) $object->uid,
+                    (int) $display,
+                  ),
+                ),
+              );
+            }
           }
         }
         break;

@@ -197,13 +197,11 @@ function disqus_element_post_render($children, &$element) {
   }
 
   // Add the disqus.js and all the settings to process the JavaScript and load Disqus.
-  $element['#attached']['js'] = array(
-    drupal_get_path('module', 'disqus') . '/disqus.js' => array(),
-    array(
-      'type' => 'setting',
-      'data' => array(
-        'disqus' => $disqus,
-      ),
+  $element['#attached']['js'][] = drupal_get_path('module', 'disqus') . '/disqus.js';
+  $element['#attached']['js'][] = array(
+    'type' => 'setting',
+    'data' => array(
+      'disqus' => $disqus,
     ),
   );
   return $children;

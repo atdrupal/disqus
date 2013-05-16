@@ -557,8 +557,7 @@ function disqus_block_view($delta = '') {
         $content = _disqus_block_content('combination_widget', $options);
         break;
       case 'disqus_comments':
-        $display = variable_get('disqus_location', 'content_area') == 'block' && user_access('view disqus comments');
-        if ($display) {
+        if (variable_get('disqus_location', 'content_area') == 'block' && user_access('view disqus comments')) {
           if ($object = menu_get_object()) {
             // For nodes, display if the Disqus object is enabled.
             if (isset($object->disqus) && $object->disqus['status']) {
@@ -571,9 +570,10 @@ function disqus_block_view($delta = '') {
                   'bin' => 'cache_block',
                   'expire' => CACHE_TEMPORARY,
                   'keys' => array(
+                    'disqus',
+                    'disqus_comments',
                     'node',
                     (int) $object->nid,
-                    (int) $display,
                   ),
                 ),
               );
@@ -590,9 +590,10 @@ function disqus_block_view($delta = '') {
                   'bin' => 'cache_block',
                   'expire' => CACHE_TEMPORARY,
                   'keys' => array(
+                    'disqus',
+                    'disqus_comments',
                     'user',
                     (int) $object->uid,
-                    (int) $display,
                   ),
                 ),
               );

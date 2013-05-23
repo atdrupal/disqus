@@ -130,9 +130,7 @@ function disqus_element_post_render($children, &$element) {
       $data['id'] = $user->uid;
       $data['username'] = $user->name;
       $data['email'] = $user->mail;
-      $data['url'] = url('user/' . $user->uid, array(
-        'absolute' => TRUE,
-      ));
+      $data['url'] = url('user/' . $user->uid, array('absolute' => TRUE));
 
       // Load the user's avatar.
       $user_picture_default = variable_get('user_picture_default', '');
@@ -243,7 +241,7 @@ function disqus_node_load($nodes, $types) {
           $node->disqus['developer'] = 1;
         }
         elseif ($developer = variable_get('disqus_developer', FALSE)) {
-          $node->disqus['developer'] = intval($developer);
+          $node->disqus['developer'] = (int) $developer;
         }
       }
     }
@@ -349,9 +347,7 @@ function disqus_user_load($users) {
         $account->disqus = array('domain' => $domain);
 
         // Build the absolute URL without the alias for the disqus_url flag.
-        $account->disqus['url'] = url('user/' . $account->uid, array(
-          'absolute' => TRUE,
-        ));
+        $account->disqus['url'] = url('user/' . $account->uid, array('absolute' => TRUE));
 
         // Build the title.
         $account->disqus['title'] = check_plain(strip_tags($account->name));
@@ -361,7 +357,7 @@ function disqus_user_load($users) {
 
         // Inject the script.
         if ($developer = variable_get('disqus_developer', FALSE)) {
-          $account->disqus['developer'] = $developer;
+          $account->disqus['developer'] = (int) $developer;
         }
       }
     }

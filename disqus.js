@@ -65,7 +65,7 @@ Drupal.behaviors.disqus = {
         // Make the AJAX call to get the Disqus comments.
         jQuery.ajax({
           type: 'GET',
-          url: 'http://' + disqus_shortname + '.disqus.com/embed.js',
+          url: '//' + disqus_shortname + '.disqus.com/embed.js',
           dataType: 'script',
           cache: false
         });
@@ -77,7 +77,7 @@ Drupal.behaviors.disqus = {
         // Make the AJAX call to get the number of comments.
         jQuery.ajax({
           type: 'GET',
-          url: 'http://' + disqus_shortname + '.disqus.com/count.js',
+          url: '//' + disqus_shortname + '.disqus.com/count.js',
           dataType: 'script',
           cache: false
         });

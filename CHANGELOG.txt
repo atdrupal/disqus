@@ -1,0 +1,5 @@
+CHANGELOG for Disqus for Drupal 7
+
+Disqus 7.x-1.x-dev
+=================================
+- #969202 by geerlingguy, aaronbauman, alias.mac, pcavanaugh, nadavoid, dashohoxha | animelion: Fixed Respect protocol of the page request.

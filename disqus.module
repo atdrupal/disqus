@@ -654,7 +654,7 @@ function _disqus_block_content($function, $options) {
       '#attributes' => array(
         'type' => 'text/javascript',
         'src' => url(
-          "http://disqus.com/forums/${options['domain']}/$function.js",
+          "//disqus.com/forums/${options['domain']}/$function.js",
           array(
             'external' => TRUE,
             'query' => $query,

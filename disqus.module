@@ -296,6 +296,9 @@ function disqus_node_view($node, $view_mode) {
         break;
     }
   }
+  else {
+    return array();
+  }
 }
 
 /**

@@ -110,13 +110,13 @@ function disqus_admin_settings() {
     '#title' => t('Secret Key'),
     '#default_value' => variable_get('disqus_secretkey', ''),
   );
-  $form['advanced']['disqus_sso'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Single Sign-On'),
-    '#description' => t('Provide <a href="@sso">Single Sign-On</a> access to your site.', array(
-      '@sso' => 'http://disqus.com/api/sso/',
-    )),
-    '#default_value' => variable_get('disqus_sso', FALSE),
+
+  $form['advanced']['sso'] = array(
+    '#weight' => 5,
+    '#type' => 'fieldset',
+    '#title' => t('Single Sign-on'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
     '#states' => array(
       'visible' => array(
         'input[name="disqus_publickey"]' => array('empty' => FALSE),
@@ -124,5 +124,39 @@ function disqus_admin_settings() {
       ),
     ),
   );
+  $form['advanced']['sso']['disqus_sso'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use Single Sign-On'),
+    '#description' => t('Provide <a href="@sso">Single Sign-On</a> access to your site.', array(
+      '@sso' => 'http://disqus.com/api/sso/',
+    )),
+    '#default_value' => variable_get('disqus_sso', FALSE),
+  );
+  $form['advanced']['sso']['disqus_use_site_logo'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use Site Logo'),
+    '#description' => t('Pass the site logo to Disqus for use as SSO login button.'),
+    '#default_value' => variable_get('disqus_use_site_logo', TRUE),
+    '#states' => array(
+      'disabled' => array(
+        'input[name="disqus_sso"]' => array('checked' => FALSE),
+      ),
+    ),
+  );
+  $form['advanced']['sso']['disqus_logo'] = array(
+    '#type' => 'managed_file',
+    '#title' => t('Custom Logo'),
+    '#upload_location' => 'public://images',
+    '#default_value' => variable_get('disqus_logo', ''),
+    '#states' => array(
+      'disabled' => array(
+        'input[name="disqus_sso"]' => array('checked' => FALSE),
+      ),
+      'visible' => array(
+        'input[name="disqus_use_site_logo"]' => array('checked' => FALSE),
+      ),
+    ),
+  );
+
   return system_settings_form($form);
 }

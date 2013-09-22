@@ -2,7 +2,6 @@
 
 namespace Drupal\disqus\Plugin\Block;
 
-use Drupal\block\BlockBase;
 use Drupal\Component\Annotation\Plugin;
 use Drupal\Core\Annotation\Translation;
 
@@ -14,13 +13,8 @@ use Drupal\Core\Annotation\Translation;
  *   module = "disqus"
  * )
  */
-class DisqusCombinationWidget extends BlockBase {
+class DisqusCombinationWidgetBlock extends DisqusBaseBlock {
   /**
-   * Overrides \Drupal\block\BlockBase::settings().
    */
-  public function settings() {
-    return array(
-      'cache' => DRUPAL_CACHE_GLOBAL,
-    );
   }
 }

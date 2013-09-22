@@ -50,34 +50,20 @@ function disqus_permission() {
  * Implements hook_menu().
  */
 function disqus_menu() {
-  $items = array();
   $items['admin/config/services/disqus'] = array(
+    'route_name' => 'disqus_admin',
     'title' => 'Disqus',
     'description' => 'Provides configuration options for the Disqus comment system.',
-    'access arguments' => array('administer disqus'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('disqus_admin_settings'),
-    'file' => 'disqus.admin.inc',
   );
+
   $items['disqus/closewindow'] = array(
+    'route_name' => 'disqus_close_window',
     'title' => 'Please wait',
     'description' => 'Once the user logs in through the Disqus login workflow, they are redirected here to automatically close the popup window.',
-    'access arguments' => array('access content'),
-    'page callback' => 'disqus_closewindow',
     'type' => MENU_CALLBACK,
   );
-  return $items;
-}
 
-/**
- * Menu callback; Automatically closes the window after the user logs in.
- *
- * @return
- *   Confirmation message and link that closes overlay window.
- */
-function disqus_closewindow() {
-  drupal_add_js('window.close();', 'inline');
-  return t('Thank you for logging in. Please close this window, or <a href="@clickhere">click here</a> to continue.', array('@clickhere' => 'javascript:window.close();'));
+  return $items;
 }
 
 /**

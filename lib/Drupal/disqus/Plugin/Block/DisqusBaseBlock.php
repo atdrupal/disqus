@@ -28,6 +28,7 @@ abstract class DisqusBaseBlock extends BlockBase {
     $form['disqus'] = array(
       '#type' => 'fieldset',
       '#title' => t('Disqus settings'),
+      '#tree' => TRUE,
     );
 
     if ($delta == 'disqus_comments') {

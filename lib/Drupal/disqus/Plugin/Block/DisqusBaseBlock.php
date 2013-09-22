@@ -15,6 +15,25 @@ abstract class DisqusBaseBlock extends BlockBase {
   }
 
   /**
+   * Helper method to get configuration value.
+   *
+   * @param  string $key
+   * @param  mixed  $default_value
+   * @return mixed
+   */
+  protected function configuration($key, $default_value = NULL) {
+    if (isset($this->configuration[$key])) {
+      return $this->configuration[$key];
+    }
+
+    if (!is_null($default_value)) {
+      return $default_value;
+    }
+
+    throw new UnexpectedValueException('Missing default value for ' . $key);
+  }
+
+  /**
    * Overrides \Drupal\block\BlockBase::blockForm().
    */
   public function blockForm($form, &$form_state) {

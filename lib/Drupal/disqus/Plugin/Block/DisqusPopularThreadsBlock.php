@@ -14,6 +14,8 @@ use Drupal\Core\Annotation\Translation;
  * )
  */
 class DisqusPopularThreadsBlock extends DisqusBaseBlock {
+  protected $id = 'disqus_popular_threads';
+
   /**
    * {@inheritdoc}
    */

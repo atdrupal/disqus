@@ -14,6 +14,8 @@ use Drupal\Core\Annotation\Translation;
  * )
  */
 class DisqusRecentCommentBlock extends DisqusBaseBlock {
+  protected $id = 'disqus_recent_comments';
+
   /**
    * {@inheritdoc}
    */

@@ -14,6 +14,8 @@ use Drupal\Core\Annotation\Translation;
  * )
  */
 class DisqusTopCommentersBlock extends DisqusBaseBlock {
+  protected $id = 'disqus_top_commenters';
+
   /**
    * {@inheritdoc}
    */

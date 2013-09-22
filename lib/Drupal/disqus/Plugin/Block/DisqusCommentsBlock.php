@@ -14,6 +14,8 @@ use Drupal\Core\Annotation\Translation;
  * )
  */
 class DisqusCommentsBlock extends DisqusBaseBlock {
+  protected $id = 'disqus_comments';
+
   /**
    * Overrides DisqusBaseBlock::settings().
    */

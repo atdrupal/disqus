@@ -14,6 +14,93 @@ abstract class DisqusBaseBlock extends BlockBase {
     );
   }
 
+  /**
+   * Overrides \Drupal\block\BlockBase::blockForm().
+   */
+  public function blockForm($form, &$form_state) {
+    return $this->_blockForm($form, $form_state, $this->id);
+  }
+
+  /**
+   * Helper for blockForm() method.
+   */
+  public function _blockForm($form, &$form_state, $delta) {
+    $form['disqus'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Disqus settings'),
+    );
+
+    if ($delta == 'disqus_comments') {
+      $form['disqus']['#description'] = t('This block will be used to display the comments from Disqus when comments are applied to the given page. Visit the <a href="@disqussettings">Disqus settings</a> to configure when this is visible.', array('@disqussettings' => url('admin/config/services/disqus')));
+    }
+
+    $form['disqus'][$delta . '_items'] = array(
+      '#type' => 'select',
+      '#title' => t('Number of items to show'),
+      '#options' => array(1 => 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
+      '#default_value' => $this->configuration($delta .'_items', 5),
+      '#access' => ($delta != 'disqus_comments'),
+    );
+    $form['disqus'][$delta . '_showavatars'] = array(
+      '#type' => 'select',
+      '#title' => t('Show avatars'),
+      '#options' => array(FALSE => t('No'), TRUE => t('Yes')),
+      '#default_value' => $this->configuration($delta .'_showavatars', TRUE),
+      '#access' => ($delta == 'disqus_recent_comments') || ($delta == 'disqus_top_commenters'),
+    );
+    $form['disqus'][$delta . '_avatarsize'] = array(
+      '#type' => 'select',
+      '#title' => t('Avatar size'),
+      '#options' => array(
+        24 => t('X-Small (24px)'),
+        32 => t('Small (32px)'),
+        48 => t('Medium (48px)'),
+        92 => t('Large (92px)'),
+        128 => t('X-Large (128px)'),
+      ),
+      '#default_value' => $this->configuration($delta .'_avatarsize', 32),
+      '#access' => ($delta == 'disqus_recent_comments') || ($delta == 'disqus_top_commenters'),
+    );
+    $form['disqus'][$delta . '_colortheme'] = array(
+      '#type' => 'select',
+      '#title' => t('Color Theme'),
+      '#options' => array(
+        'blue' => t('Blue'),
+        'grey' => t('Grey'),
+        'green' => t('Green'),
+        'red' => t('Red'),
+        'orange' => t('Orange'),
+      ),
+      '#default_value' => $this->configuration($delta .'_colortheme', 'blue'),
+      '#access' => $delta == 'disqus_combination_widget',
+    );
+    $form['disqus'][$delta . '_defaulttabview'] = array(
+      '#type' => 'select',
+      '#title' => t('Default Tab View'),
+      '#options' => array(
+        'people' => t('People'),
+        'recent' => t('Recent'),
+        'popular' => t('Popular'),
+      ),
+      '#default_value' => $this->configuration($delta .'_defaulttabview', 'people'),
+      '#access' => $delta == 'disqus_combination_widget',
+    );
+    $form['disqus'][$delta . '_excerpt_length'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Comment Except Length'),
+      '#default_value' => $this->configuration($delta .'_excerpt_length', '200'),
+      '#access' => ($delta == 'disqus_recent_comments') || ($delta == 'disqus_combination_widget'),
+      '#size' => 4,
+    );
+    $form['disqus'][$delta . '_hide_mods'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Hide moderators in ranking'),
+      '#default_value' => $this->configuration($delta .'_hide_mods', FALSE),
+      '#access' => ($delta == 'disqus_top_commenters') || ($delta == 'disqus_combination_widget'),
+    );
+    return $form;
+  }
+
   protected function getOptions() {
     return array(
       'num_items' => $this->configuration($delta . '_items', 5),

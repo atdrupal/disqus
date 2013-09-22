@@ -423,6 +423,19 @@ function disqus_form_alter(&$form, $form_state, $form_id) {
 }
 
 /**
+ * Implements hook_views_data_alter().
+ */
+function disqus_views_data_alter(&$data) {
+  // Number of Disqus comments made on the given node.
+  $data['node']['disqus_comment_count']['field'] = array(
+    'title' => t('Disqus Comment Count'),
+    'group' => t('Content'),
+    'help' => t('The number of Disqus comments made on the post. Note that this will not work in the preview.'),
+    'id' => 'disqus_comment_count',
+  );
+}
+
+/**
  * Implements hook_theme().
  */
 function disqus_theme() {
@@ -463,11 +476,4 @@ function theme_disqus_noscript($variables = array()) {
 function disqus($user_api_key = NULL, $forum_api_key = NULL) {
   module_load_include('php', 'disqus', 'disqus');
   return new Disqus($user_api_key, $forum_api_key);
-}
-
-/**
- * Implementation of hook_views_api().
- */
-function disqus_views_api() {
-  return array('api' => 3);
 }

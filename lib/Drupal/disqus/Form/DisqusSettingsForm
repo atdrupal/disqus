@@ -2,10 +2,10 @@
 
 namespace Drupal\disqus\Form;
 
-use Drupal\system\SystemConfigFormBase;
+use Drupal\Core\Form\ConfigFormBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DisqusSettingsForm extends SystemConfigFormBase {
+class DisqusSettingsForm extends ConfigFormBase {
   /**
    * Constructs a SiteInformationForm object.
    *
@@ -181,5 +181,9 @@ class DisqusSettingsForm extends SystemConfigFormBase {
         ),
       ),
     );
+  }
+
+  public function submitForm(array &$form, array &$form_state) {
+    parent::submitForm($form, $form_state);
   }
 }

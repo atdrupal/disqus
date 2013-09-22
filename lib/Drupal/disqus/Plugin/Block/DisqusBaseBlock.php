@@ -22,15 +22,6 @@ abstract class DisqusBaseBlock extends BlockBase {
   }
 
   /**
-   * Overrides \Drupal\block\BlockBase::blockSubmit().
-   */
-  public function blockSubmit($form, &$form_state) {
-    foreach ($form_state['values']['disqus'] as $k => $v) {
-      $this->configuration[$k] = $v;
-    }
-  }
-
-  /**
    * Helper for blockForm() method.
    */
   public function _blockForm($form, &$form_state, $delta) {
@@ -106,6 +97,15 @@ abstract class DisqusBaseBlock extends BlockBase {
       '#access' => ($delta == 'disqus_top_commenters') || ($delta == 'disqus_combination_widget'),
     );
     return $form;
+  }
+
+  /**
+   * Overrides \Drupal\block\BlockBase::blockSubmit().
+   */
+  public function blockSubmit($form, &$form_state) {
+    foreach ($form_state['values']['disqus'] as $k => $v) {
+      $this->configuration[$k] = $v;
+    }
   }
 
   protected function getOptions() {

@@ -26,6 +26,27 @@ class DisqusCommentsBlock extends DisqusBaseBlock {
   }
 
   /**
+   * Overrides DisqusBaseBlock::blockForm().
+   */
+  public function blockForm($form, &$form_state) {
+    $form['disqus'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Disqus settings'),
+      '#tree' => TRUE,
+    );
+
+    if ($delta == 'disqus_comments') {
+      $form['disqus']['#description'] = t('This block will be used to display the comments from Disqus when comments are applied to the given page. Visit the <a href="@disqussettings">Disqus settings</a> to configure when this is visible.', array('@disqussettings' => url('admin/config/services/disqus')));
+    }
+  }
+
+  /**
+   * Overrides DisqusBaseBlock::blockSubmit().
+   */
+  public function blockSubmit($form, &$form_state) {
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function build() {

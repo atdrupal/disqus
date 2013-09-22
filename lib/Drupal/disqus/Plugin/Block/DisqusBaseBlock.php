@@ -40,16 +40,11 @@ abstract class DisqusBaseBlock extends BlockBase {
       '#tree' => TRUE,
     );
 
-    if ($delta == 'disqus_comments') {
-      $form['disqus']['#description'] = t('This block will be used to display the comments from Disqus when comments are applied to the given page. Visit the <a href="@disqussettings">Disqus settings</a> to configure when this is visible.', array('@disqussettings' => url('admin/config/services/disqus')));
-    }
-
     $form['disqus'][$delta . '_items'] = array(
       '#type' => 'select',
       '#title' => t('Number of items to show'),
       '#options' => array(1 => 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
       '#default_value' => $this->configuration($delta .'_items', 5),
-      '#access' => ($delta != 'disqus_comments'),
     );
     $form['disqus'][$delta . '_showavatars'] = array(
       '#type' => 'select',
@@ -95,6 +90,7 @@ abstract class DisqusBaseBlock extends BlockBase {
       '#default_value' => $this->configuration($delta .'_defaulttabview', 'people'),
       '#access' => $delta == 'disqus_combination_widget',
     );
+
     $form['disqus'][$delta . '_excerpt_length'] = array(
       '#type' => 'textfield',
       '#title' => t('Comment Except Length'),
@@ -102,6 +98,7 @@ abstract class DisqusBaseBlock extends BlockBase {
       '#access' => ($delta == 'disqus_recent_comments') || ($delta == 'disqus_combination_widget'),
       '#size' => 4,
     );
+
     $form['disqus'][$delta . '_hide_mods'] = array(
       '#type' => 'checkbox',
       '#title' => t('Hide moderators in ranking'),

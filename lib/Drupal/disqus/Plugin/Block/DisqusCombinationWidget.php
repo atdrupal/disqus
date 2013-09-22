@@ -11,7 +11,7 @@ use Drupal\Core\Annotation\Translation;
  * @Plugin(
  *   id = "disqus_combination_widget",
  *   admin_label = @Translation("Disqus: Combination Widget"),
- *   module = "user"
+ *   module = "disqus"
  * )
  */
 class DisqusCombinationWidget extends BlockBase {

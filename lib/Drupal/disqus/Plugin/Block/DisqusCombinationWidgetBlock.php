@@ -14,6 +14,8 @@ use Drupal\Core\Annotation\Translation;
  * )
  */
 class DisqusCombinationWidgetBlock extends DisqusBaseBlock {
+  protected $id = 'disqus_combination_widget';
+
   /**
    * {@inheritdoc}
    */

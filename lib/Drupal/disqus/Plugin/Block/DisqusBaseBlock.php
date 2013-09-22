@@ -37,7 +37,7 @@ abstract class DisqusBaseBlock extends BlockBase {
    * @return
    *   Render array that can be directly used for block content.
    */
-  function _disqus_block_content($function, $options) {
+  function render($function, $options) {
     $configuration = array(
       'recent_comments_widget' => array(
         'id' => 'dsq-recentcomments',

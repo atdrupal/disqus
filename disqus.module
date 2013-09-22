@@ -474,6 +474,5 @@ function theme_disqus_noscript($variables = array()) {
  *   The instance of the Disqus API.
  */
 function disqus($user_api_key = NULL, $forum_api_key = NULL) {
-  module_load_include('php', 'disqus', 'disqus');
-  return new Disqus($user_api_key, $forum_api_key);
+  return new \Drupal\disqus\Disqus($user_api_key, $forum_api_key);
 }

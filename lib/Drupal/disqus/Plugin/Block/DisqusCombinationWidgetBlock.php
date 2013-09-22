@@ -15,6 +15,12 @@ use Drupal\Core\Annotation\Translation;
  */
 class DisqusCombinationWidgetBlock extends DisqusBaseBlock {
   /**
+   * {@inheritdoc}
    */
+  public function build() {
+    return array(
+      '#title' => t('Comments'),
+      $this->render('combination_widget')
+    );
   }
 }

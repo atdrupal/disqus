@@ -15,6 +15,12 @@ use Drupal\Core\Annotation\Translation;
  */
 class DisqusTopCommentersBlock extends DisqusBaseBlock {
   /**
+   * {@inheritdoc}
    */
+  public function build() {
+    return array(
+      '#title' => t('Top Commenters'),
+      $this->render('top_commenters_widget')
+    );
   }
 }

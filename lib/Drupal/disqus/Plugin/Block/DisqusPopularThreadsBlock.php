@@ -15,6 +15,12 @@ use Drupal\Core\Annotation\Translation;
  */
 class DisqusPopularThreadsBlock extends DisqusBaseBlock {
   /**
+   * {@inheritdoc}
    */
+  public function build() {
+    return array(
+      '#title' => t('Popular Threads'),
+      $this->render('popular_threads_widget')
+    );
   }
 }

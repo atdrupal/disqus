@@ -15,6 +15,12 @@ use Drupal\Core\Annotation\Translation;
  */
 class DisqusRecentCommentBlock extends DisqusBaseBlock {
   /**
+   * {@inheritdoc}
    */
+  public function build() {
+    return array(
+      '#title' => t('Recent Comments'),
+      $this->render('recent_comments_widget')
+    );
   }
 }

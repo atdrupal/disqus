@@ -1,17 +1,6 @@
 <?php
 
 /**
- * Implements hook_block_info().
- */
-function disqus_block_info() {
-  $blocks['disqus_comments'] = array(
-    'info' => t('Disqus: Comments'),
-    'cache' => DRUPAL_CACHE_CUSTOM,
-  );
-  return $blocks;
-}
-
-/**
  * Implements hook_block_configure().
  */
 function disqus_block_configure($delta = '') {

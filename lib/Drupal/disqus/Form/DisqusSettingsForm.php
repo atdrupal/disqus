@@ -134,12 +134,12 @@ class DisqusSettingsForm extends ConfigFormBase {
     $form['advanced']['disqus_publickey'] = array(
       '#type' => 'textfield',
       '#title' => t('Public Key'),
-      '#default_value' => $disqus_config->get('advanced.sso.disqus_publickey'),
+      '#default_value' => $disqus_config->get('advanced.disqus_publickey'),
     );
     $form['advanced']['disqus_secretkey'] = array(
       '#type' => 'textfield',
       '#title' => t('Secret Key'),
-      '#default_value' => $disqus_config->get('advanced.sso.disqus_secretkey'),
+      '#default_value' => $disqus_config->get('advanced.disqus_secretkey'),
     );
 
     $form['advanced']['sso'] = array(

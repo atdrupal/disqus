@@ -30,6 +30,26 @@ Drupal.behaviors.disqusSettingsForm = {
 
       return vals.join(', ');
     });
+
+    $context.find('#edit-behavior').drupalSetSummary(function(context) {
+      var vals = [];
+
+      // edit-disqus-userapikey
+      // edit-disqus-localization
+      // edit-disqus-inherit-login
+      // edit-disqus-developer
+
+      return vals.join(', ');
+    });
+
+    $context.find('#edit-advanced').drupalSetSummary(function(context) {
+      var vals = [];
+
+      // edit-disqus-publickey
+      // edit-disqus-secretkey
+
+      return vals.join(', ');
+    });
   }
 };
 

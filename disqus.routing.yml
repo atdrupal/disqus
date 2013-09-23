@@ -1,4 +1,4 @@
-disqus_admin:
+disqus.admin:
   path: 'admin/config/services/disqus'
   _title: 'Disqus'
   _description: 'Provides configuration options for the Disqus comment system.'
@@ -13,5 +13,6 @@ disqus_close_window:
   _description: 'Once the user logs in through the Disqus login workflow they are redirected here to automatically close the popup window.'
   requirements:
     _permission: access content
+disqus.close_window:
   defaults:
     _content: 'disqus_closewindow'

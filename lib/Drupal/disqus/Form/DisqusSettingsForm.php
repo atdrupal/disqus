@@ -31,6 +31,13 @@ class DisqusSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
+  public function getFormID() {
+    return 'disqus_settings_form';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildForm(array $form, array &$form_state) {
     $disqus_config = $this->configFactory->get('disqus.settings');
 

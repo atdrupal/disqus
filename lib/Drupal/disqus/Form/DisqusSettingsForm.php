@@ -49,11 +49,16 @@ class DisqusSettingsForm extends ConfigFormBase {
     );
     $form['settings'] = array(
       '#type' => 'vertical_tabs',
+      '#attached' => array(
+        'js' => array(
+          drupal_get_path('module', 'disqus') . '/disqus.settings.js'
+        ),
+      ),
       '#weight' => 50,
     );
     // Visibility settings.
     $form['visibility'] = array(
-      '#type' => 'fieldset',
+      '#type' => 'details',
       '#title' => t('Visibility'),
       '#group' => 'settings',
     );
@@ -93,7 +98,7 @@ class DisqusSettingsForm extends ConfigFormBase {
     );
     // Behavior settings.
     $form['behavior'] = array(
-      '#type' => 'fieldset',
+      '#type' => 'details',
       '#title' => t('Behavior'),
       '#group' => 'settings',
     );
@@ -123,7 +128,7 @@ class DisqusSettingsForm extends ConfigFormBase {
     );
     // Advanced settings.
     $form['advanced'] = array(
-      '#type' => 'fieldset',
+      '#type' => 'details',
       '#title' => t('Advanced'),
       '#group' => 'settings',
       '#description' => t('Use these settings to configure the more advanced uses of Disqus. You can find more information about these in the <a href="@applications">Applications</a> section of Disqus. To enable some of these features, you will require a <a href="@addons">Disqus Add-on Package</a>.', array(

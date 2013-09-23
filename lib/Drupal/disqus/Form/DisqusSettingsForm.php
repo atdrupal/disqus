@@ -188,6 +188,14 @@ class DisqusSettingsForm extends ConfigFormBase {
         ),
       ),
     );
+
+    $form['actions'] = array('#type' => 'actions');
+    $form['actions']['submit'] = array(
+      '#type' => 'submit',
+      '#value' => $this->t('Add'),
+    );
+
+    return $form;
   }
 
   public function submitForm(array &$form, array &$form_state) {

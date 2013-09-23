@@ -1,16 +1,14 @@
 disqus.admin:
   path: 'admin/config/services/disqus'
   _title: 'Disqus'
-  requirements:
-    _permission: administer disqus
   defaults:
-    _form: 'disqus_admin_settings'
-
-disqus_close_window:
-  path: 'disqus/closewindow'
-  _title: Please wait
+    _form: '\Drupal\disqus\Form\DisqusSettingsForm'
   requirements:
-    _permission: access content
+    _permission: 'administer disqus'
 disqus.close_window:
+  path: 'disqus/closewindow'
+  _title: 'Please wait'
   defaults:
-    _content: 'disqus_closewindow'
+    _content: 'Drupal\disqus\Controller\DisqusController::closeWindow'
+  requirements:
+    _permission: 'access content'

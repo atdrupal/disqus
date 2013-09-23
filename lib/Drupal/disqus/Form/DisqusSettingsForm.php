@@ -24,7 +24,7 @@ class DisqusSettingsForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
-      $container->get('config.context.free'),
+      $container->get('config.context.free')
     );
   }
 

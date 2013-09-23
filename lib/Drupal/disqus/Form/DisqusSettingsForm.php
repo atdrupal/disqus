@@ -199,6 +199,41 @@ class DisqusSettingsForm extends ConfigFormBase {
   }
 
   public function submitForm(array &$form, array &$form_state) {
+    $this->configFactory->get('disqus.settings')
+      ->set('disqus_domain', $form_state['values']['disqus_domain'])
+      ->set('visibility.disqus_nodetypes', $form_state['values']['disqus_nodetypes'])
+      ->set('visibility.disqus_location', $form_state['values']['disqus_location'])
+      ->set('visibility.disqus_weight', $form_state['values']['disqus_weight'])
+      ->set('behavior.disqus_userapikey', $form_state['values']['disqus_userapikey'])
+      ->set('behavior.disqus_localization', $form_state['values']['disqus_localization'])
+      ->set('behavior.disqus_inherit_login', $form_state['values']['disqus_inherit_login'])
+      ->set('behavior.disqus_developer', $form_state['values']['disqus_developer'])
+      ->set('advanced.disqus_publickey', $form_state['values']['disqus_publickey'])
+      ->set('advanced.disqus_secretkey', $form_state['values']['disqus_secretkey'])
+      ->set('advanced.sso.disqus_sso', $form_state['values']['disqus_sso'])
+      ->set('advanced.sso.disqus_use_site_logo', $form_state['values']['disqus_use_site_logo'])
+      ->set('advanced.sso.disqus_logo', $form_state['values']['disqus_logo'])
+      ->save();
+
     parent::submitForm($form, $form_state);
+
+    // $old_logo = variable_get('disqus_logo', '');
+    // $new_logo = (isset($form_state['values']['disqus_logo'])) ? $form_state['values']['disqus_logo'] : '';
+    // // Ignore if the file hasn't changed.
+    // if ($new_logo != $old_logo) {
+    //   // Remove the old file and usage if previously set.
+    //   if ($old_logo != '') {
+    //     $file = file_load($old_logo);
+    //     file_usage_delete($file, 'disqus', 'disqus');
+    //     file_delete($file);
+    //   }
+    //   // Update the new file and usage.
+    //   if ($new_logo != '') {
+    //     $file = file_load($new_logo);
+    //     file_usage_add($file, 'disqus', 'disqus', 0);
+    //     $file->status = FILE_STATUS_PERMANENT;
+    //     file_save($file);
+    //   }
+    // }
   }
 }

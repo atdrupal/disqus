@@ -66,14 +66,14 @@ class DisqusSettingsForm extends ConfigFormBase {
       '#type' => 'checkboxes',
       '#title' => t('Node Types'),
       '#description' => t('Apply comments to only the following node types.'),
-      '#default_value' => $disqus_config->get('disqus_nodetypes'),
+      '#default_value' => $disqus_config->get('visibility.disqus_nodetypes'),
       '#options' => $options,
     );
     $form['visibility']['disqus_location'] = array(
       '#type' => 'select',
       '#title' => t('Location'),
       '#description' => t('Display the Disqus comments in the given location. When "Block" is selected, the comments will appear in the <a href="@disquscomments">Disqus Comments block</a>.', array('@disquscomments' => url('admin/structure/block'))),
-      '#default_value' => $disqus_config->get('disqus_location'),
+      '#default_value' => $disqus_config->get('visibility.disqus_location'),
       '#options' => array(
         'content_area' => t('Content Area'),
         'block' => t('Block'),
@@ -83,7 +83,7 @@ class DisqusSettingsForm extends ConfigFormBase {
       '#type' => 'select',
       '#title' => t('Weight'),
       '#description' => t('When the comments are displayed in the content area, you can change the position at which they will be shown.'),
-      '#default_value' => $disqus_config->get('disqus_weight'),
+      '#default_value' => $disqus_config->get('visibility.disqus_weight'),
       '#options' => drupal_map_assoc(array(-100, -75, -50, -25, 0, 25, 50, 75, 100)),
       '#states' => array(
         'visible' => array(
@@ -101,25 +101,25 @@ class DisqusSettingsForm extends ConfigFormBase {
       '#type' => 'textfield',
       '#title' => t('User API Key'),
       '#description' => t('The API key of the administrator account on Disqus. You can get yours <a href="@key">here</a>.', array('@key' => 'http://disqus.com/api/get_my_key/')),
-      '#default_value' => $disqus_config->get('disqus_userapikey'),
+      '#default_value' => $disqus_config->get('behavior.disqus_userapikey'),
     );
     $form['behavior']['disqus_localization'] = array(
       '#type' => 'checkbox',
       '#title' => t('Localization support'),
       '#description' => t("When enabled, overrides the language set by Disqus with the language provided by the site."),
-      '#default_value' => $disqus_config->get('disqus_localization'),
+      '#default_value' => $disqus_config->get('behavior.disqus_localization'),
     );
     $form['behavior']['disqus_inherit_login'] = array(
       '#type' => 'checkbox',
       '#title' => t('Inherit User Credentials'),
       '#description' => t("When enabled and a user is logged in, the Disqus 'Post as Guest' login form will be pre-filled with the user's name and email address."),
-      '#default_value' => $disqus_config->get('disqus_inherit_login'),
+      '#default_value' => $disqus_config->get('behavior.disqus_inherit_login'),
     );
     $form['behavior']['disqus_developer'] = array(
       '#type' => 'checkbox',
       '#title' => t('Testing'),
       '#description' => t('When enabled, uses the <a href="http://docs.disqus.com/help/2/">disqus_developer</a> flag to tell Disqus that you are in a testing environment. Threads will not display on the public community page with this set.'),
-      '#default_value' => $disqus_config->get('disqus_developer'),
+      '#default_value' => $disqus_config->get('behavior.disqus_developer'),
     );
     // Advanced settings.
     $form['advanced'] = array(
@@ -134,12 +134,12 @@ class DisqusSettingsForm extends ConfigFormBase {
     $form['advanced']['disqus_publickey'] = array(
       '#type' => 'textfield',
       '#title' => t('Public Key'),
-      '#default_value' => $disqus_config->get('disqus_publickey'),
+      '#default_value' => $disqus_config->get('advanced.sso.disqus_publickey'),
     );
     $form['advanced']['disqus_secretkey'] = array(
       '#type' => 'textfield',
       '#title' => t('Secret Key'),
-      '#default_value' => $disqus_config->get('disqus_secretkey'),
+      '#default_value' => $disqus_config->get('advanced.sso.disqus_secretkey'),
     );
 
     $form['advanced']['sso'] = array(
@@ -167,7 +167,7 @@ class DisqusSettingsForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => t('Use Site Logo'),
       '#description' => t('Pass the site logo to Disqus for use as SSO login button.'),
-      '#default_value' => $disqus_config->get('disqus_use_site_logo'),
+      '#default_value' => $disqus_config->get('advanced.sso.disqus_use_site_logo'),
       '#states' => array(
         'disabled' => array(
           'input[name="disqus_sso"]' => array('checked' => FALSE),
@@ -178,7 +178,7 @@ class DisqusSettingsForm extends ConfigFormBase {
       '#type' => 'managed_file',
       '#title' => t('Custom Logo'),
       '#upload_location' => 'public://images',
-      '#default_value' => $disqus_config->get('disqus_logo'),
+      '#default_value' => $disqus_config->get('advanced.sso.disqus_logo'),
       '#states' => array(
         'disabled' => array(
           'input[name="disqus_sso"]' => array('checked' => FALSE),

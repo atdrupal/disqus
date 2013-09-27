@@ -2,8 +2,10 @@ disqus.admin:
   path: '/admin/config/services/disqus'
   defaults:
     _form: '\Drupal\disqus\Form\DisqusSettingsForm'
+    _title: 'Disqus'
   requirements:
     _permission: 'administer disqus'
+
 disqus.close_window:
   path: '/disqus/closewindow'
   defaults:

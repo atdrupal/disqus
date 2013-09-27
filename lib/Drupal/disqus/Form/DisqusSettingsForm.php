@@ -102,12 +102,6 @@ class DisqusSettingsForm extends ConfigFormBase {
       '#title' => t('Behavior'),
       '#group' => 'settings',
     );
-    $form['behavior']['disqus_userapikey'] = array(
-      '#type' => 'textfield',
-      '#title' => t('User API Key'),
-      '#description' => t('The API key of the administrator account on Disqus. You can get yours <a href="@key">here</a>.', array('@key' => 'http://disqus.com/api/get_my_key/')),
-      '#default_value' => $disqus_config->get('behavior.disqus_userapikey'),
-    );
     $form['behavior']['disqus_localization'] = array(
       '#type' => 'checkbox',
       '#title' => t('Localization support'),
@@ -209,7 +203,6 @@ class DisqusSettingsForm extends ConfigFormBase {
       ->set('visibility.disqus_nodetypes', $form_state['values']['disqus_nodetypes'])
       ->set('visibility.disqus_location', $form_state['values']['disqus_location'])
       ->set('visibility.disqus_weight', $form_state['values']['disqus_weight'])
-      ->set('behavior.disqus_userapikey', $form_state['values']['disqus_userapikey'])
       ->set('behavior.disqus_localization', $form_state['values']['disqus_localization'])
       ->set('behavior.disqus_inherit_login', $form_state['values']['disqus_inherit_login'])
       ->set('behavior.disqus_developer', $form_state['values']['disqus_developer'])

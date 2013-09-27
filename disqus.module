@@ -95,10 +95,11 @@ function disqus_element_post_render($children, &$element) {
   }
 
   // If the user is logged in, we can inject the username and email for Disqus.
-  global $user;
-  if (variable_get('disqus_inherit_login', TRUE) && $user->uid > 0) {
-    $disqus['name'] = $user->name;
-    $disqus['email'] = $user->mail;
+  $account = \Drupal::currentUser();
+
+  if (variable_get('disqus_inherit_login', TRUE) && !$account->isAnonymous()) {
+    $disqus['name'] = $account->getUsername();
+    $disqus['email'] = $account->getEmail();
   }
 
   // Provide alternate language support if desired.
@@ -112,15 +113,15 @@ function disqus_element_post_render($children, &$element) {
     $data = array();
 
     // Inject the user data if it's available.
-    if ($user->uid > 0) {
-      $data['id'] = $user->uid;
-      $data['username'] = $user->name;
-      $data['email'] = $user->mail;
-      $data['url'] = url('user/' . $user->uid, array('absolute' => TRUE));
+    if (!$account->isAnonymous()) {
+      $data['id'] = $account->id();
+      $data['username'] = $account->getUsername();
+      $data['email'] = $account->getEmail();
+      $data['url'] = url('user/' . $account->id(), array('absolute' => TRUE));
 
       // Load the user's avatar.
       $user_picture_default = variable_get('user_picture_default', '');
-      if (isset($user->picture) && !empty($user->picture) && is_numeric($user->picture) && $file = file_load($user->picture)) {
+      if (isset($account->picture) && !empty($account->picture) && is_numeric($account->picture) && $file = file_load($account->picture)) {
         $data['avatar'] = !empty($file->uri) ? $file->uri : NULL;
       }
       elseif (!empty($user_picture_default)) {

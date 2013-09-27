@@ -21,32 +21,43 @@ Drupal.behaviors.disqusSettingsForm = {
         }
 
         if (vals_node_types.length) {
-          vals.push(Drupal.t('Content types: ') + vals_node_types.join(', '));
+          vals.push($('label[for="edit-disqus-nodetypes"]').text() + ': ' + vals_node_types.join(', '));
         }
       });
 
       vals.push(Drupal.t('Location: ') + Drupal.checkPlain($('#edit-disqus-location').val()));
       vals.push(Drupal.t('Weight: ') + Drupal.checkPlain($('#edit-disqus-weight').val()));
 
-      return vals.join(', ');
+      return vals.join('<br />');
     });
 
     $context.find('#edit-behavior').drupalSetSummary(function(context) {
       var vals = [];
 
-      // edit-disqus-userapikey
-      // edit-disqus-localization
-      // edit-disqus-inherit-login
-      // edit-disqus-developer
+      if ($('#edit-disqus-userapikey').val()) {
+        vals.push($('#edit-disqus-userapikey').parent().find('label').text());
+      }
 
-      return vals.join(', ');
+      var checkboxes = ['#edit-disqus-localization', '#edit-disqus-inherit-login', '#edit-disqus-developer'];
+      for (var i in checkboxes) {
+        if ($(checkboxes[i]).is(':checked')) {
+          vals.push($(checkboxes[i]).parent().find('label').text());
+        }
+      }
+
+      return vals.join('<br />');
     });
 
     $context.find('#edit-advanced').drupalSetSummary(function(context) {
       var vals = [];
 
-      // edit-disqus-publickey
-      // edit-disqus-secretkey
+      if ($('#edit-disqus-publickey').val()) {
+        vals.push($('#edit-disqus-publickey').parent().find('label').text());
+      }
+
+      if ($('#edit-disqus-secretkey').val()) {
+        vals.push($('#edit-disqus-secretkey').parent().find('label').text());
+      }
 
       return vals.join(', ');
     });

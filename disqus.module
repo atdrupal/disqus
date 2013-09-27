@@ -212,27 +212,27 @@ function disqus_node_load($nodes, $types) {
   if (!empty($domain)) {
     // Load Disqus into the nodes.
     foreach ($nodes as &$node) {
-      if (!empty($disqustypes[$node->type])) {
+      if (!empty($disqustypes[$node->getType()])) {
         // Save the data to the node object.
         $node->disqus = array('domain' => $domain);
 
         // Apply the Disqus status to the node.
-        $status = db_query("SELECT status FROM {disqus} WHERE nid = :nid", array(':nid' => $node->nid))->fetchObject();
+        $status = db_query("SELECT status FROM {disqus} WHERE nid = :nid", array(':nid' => $node->id()))->fetchObject();
         $node->disqus['status'] = isset($status->status) ? (bool)$status->status : TRUE;
 
         // Build the absolute URL without the alias for the disqus_url flag.
-        $node->disqus['url'] = url("node/$node->nid", array(
+        $node->disqus['url'] = url("node/$node->id()", array(
           'absolute' => TRUE,
         ));
 
         // Build the title.
-        $node->disqus['title'] = check_plain(strip_tags($node->title));
+        $node->disqus['title'] = check_plain(strip_tags($node->getTitle()));
 
         // Provide the identifier.
-        $node->disqus['identifier'] = 'node/' . $node->nid;
+        $node->disqus['identifier'] = 'node/' . $node->id();
 
         // The developer flag must always be set when the node is unpublished.
-        if ($node->status == 0) {
+        if (!$node->isPublished()) {
           $node->disqus['developer'] = 1;
         }
         elseif ($developer = $disqus_config->get('behavior.disqus_developer')) {
@@ -266,12 +266,12 @@ function disqus_node_view($node, $view_mode) {
         // Display the Disqus link.
         $links['disqus_comments_num'] = array(
           'title' => t('Comments'),
-          'href' => 'node/' . $node->nid,
+          'href' => 'node/' . $node->id(),
           'fragment' => 'disqus_thread',
           'attributes' => array(
             // Identify the node for Disqus with the unique identifier:
             // http://docs.disqus.com/developers/universal/#comment-count
-            'data-disqus-identifier' => 'node/' . $node->nid,
+            'data-disqus-identifier' => 'node/' . $node->id(),
           ),
         );
         $node->content['links']['disqus'] = array(
@@ -300,7 +300,7 @@ function disqus_node_view($node, $view_mode) {
  * Implements hook_node_delete().
  */
 function disqus_node_delete($node) {
-  db_delete('disqus')->condition('nid', $node->nid)->execute();
+  db_delete('disqus')->condition('nid', $node->id())->execute();
 }
 
 /**
@@ -310,7 +310,7 @@ function disqus_node_insert($node) {
   // Write the value only if it's disabled (default is enabled).
   if (isset($node->disqus_status) && $node->disqus_status == FALSE) {
     $data = array(
-      'nid' => $node->nid,
+      'nid' => $node->id(),
       'status' => $node->disqus_status,
     );
     drupal_write_record('disqus', $data);
@@ -391,7 +391,7 @@ function disqus_form_alter(&$form, $form_state, $form_id) {
     // Only display the toggle Disqus comments setting if comments are available
     // for the given node type.
     $types = variable_get('disqus_nodetypes', array());
-    if (isset($types[$node->type]) && !empty($types[$node->type])) {
+    if (isset($types[$node->getType()]) && !empty($types[$node->getType()])) {
       // Add a comment settings fieldset for users with "toggle disqus comments" permission
       // when Drupal core Comments module is disabled.
       if (!isset($form['comment_settings'])) {

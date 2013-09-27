@@ -50,7 +50,9 @@ class DisqusCommentsBlock extends DisqusBaseBlock {
    * {@inheritdoc}
    */
   public function build() {
-    if (variable_get('disqus_location', 'content_area') == 'block' && user_access('view disqus comments')) {
+    $disqus_config = \Drupal::config('disqus.settings');
+
+    if ($disqus_config->get('visibility.disqus_location') === 'block' && user_access('view disqus comments')) {
       if ($object = menu_get_object()) {
         return $this->buildForNodeEntity($object);
       }

@@ -202,11 +202,13 @@ function disqus_element_post_render($children, &$element) {
  * Implements hook_node_load().
  */
 function disqus_node_load($nodes, $types) {
+  $disqus_config = \Drupal::config('disqus.settings');
+
   // Make sure we only load Disqus on nodes of the desired types.
-  $disqustypes = variable_get('disqus_nodetypes', array());
+  $disqustypes = $disqus_config->get('visibility.disqus_nodetypes');
 
   // Check which Disqus domain to use.
-  $domain = variable_get('disqus_domain', '');
+  $domain = $disqus_config->get('disqus_domain');
   if (!empty($domain)) {
     // Load Disqus into the nodes.
     foreach ($nodes as &$node) {
@@ -233,7 +235,7 @@ function disqus_node_load($nodes, $types) {
         if ($node->status == 0) {
           $node->disqus['developer'] = 1;
         }
-        elseif ($developer = variable_get('disqus_developer', FALSE)) {
+        elseif ($developer = $disqus_config->get('behavior.disqus_developer')) {
           $node->disqus['developer'] = (int) $developer;
         }
       }

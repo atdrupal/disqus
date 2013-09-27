@@ -35,9 +35,9 @@ class DisqusCommentsBlock extends DisqusBaseBlock {
       '#tree' => TRUE,
     );
 
-    if ($delta == 'disqus_comments') {
-      $form['disqus']['#description'] = t('This block will be used to display the comments from Disqus when comments are applied to the given page. Visit the <a href="@disqussettings">Disqus settings</a> to configure when this is visible.', array('@disqussettings' => url('admin/config/services/disqus')));
-    }
+    $form['disqus']['#description'] = t('This block will be used to display the comments from Disqus when comments are applied to the given page. Visit the <a href="@disqussettings">Disqus settings</a> to configure when this is visible.', array('@disqussettings' => url('admin/config/services/disqus')));
+
+    return $form;
   }
 
   /**

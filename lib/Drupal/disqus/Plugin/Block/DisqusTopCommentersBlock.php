@@ -2,12 +2,12 @@
 
 namespace Drupal\disqus\Plugin\Block;
 
-use Drupal\Component\Annotation\Plugin;
+use Drupal\block\Annotation\Block;
 use Drupal\Core\Annotation\Translation;
 
 /**
  *
- * @Plugin(
+ * @Block(
  *   id = "disqus_top_commenters",
  *   admin_label = @Translation("Disqus: Top Commenters"),
  *   module = "disqus"

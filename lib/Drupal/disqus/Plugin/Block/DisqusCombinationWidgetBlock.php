@@ -2,12 +2,12 @@
 
 namespace Drupal\disqus\Plugin\Block;
 
-use Drupal\Component\Annotation\Plugin;
+use Drupal\block\Annotation\Block;
 use Drupal\Core\Annotation\Translation;
 
 /**
  *
- * @Plugin(
+ * @Block(
  *   id = "disqus_combination_widget",
  *   admin_label = @Translation("Disqus: Combination Widget"),
  *   module = "disqus"

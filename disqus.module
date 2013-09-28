@@ -221,7 +221,7 @@ function disqus_node_load($nodes, $types) {
         $node->disqus['status'] = isset($status->status) ? (bool)$status->status : TRUE;
 
         // Build the absolute URL without the alias for the disqus_url flag.
-        $node->disqus['url'] = url("node/$node->id()", array(
+        $node->disqus['url'] = url('node/' . $node->id(), array(
           'absolute' => TRUE,
         ));
 

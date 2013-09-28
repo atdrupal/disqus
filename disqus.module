@@ -247,7 +247,7 @@ function disqus_node_load($nodes, $types) {
  * Implements hook_node_view().
  */
 function disqus_node_view($node, $view_mode) {
-  if (isset($node->disqus) && user_access('view disqus comments') && $node->disqus['status'] == 1) {
+  if (isset($node->disqus) && Drupal::currentUser()->hasPermission('view disqus comments') && $node->disqus['status'] == 1) {
     switch ($view_mode) {
       case 'full':
         // Inject Disqus into the node object.
@@ -340,7 +340,7 @@ function disqus_user_load($users) {
   if (!empty($domain)) {
     foreach ($users as &$account) {
       // Only show on the profile if desired. Don't show on the administrator's profile.
-      if (user_access('display disqus comments on profile', $account) && $account->uid != 1) {
+      if (Drupal::currentUser()->hasPermission('display disqus comments on profile', $account) && $account->uid != 1) {
         // Save the data to the user object.
         $account->disqus = array('domain' => $domain);
 
@@ -374,7 +374,7 @@ function disqus_user_view($account, $view_mode, $langcode) {
           '#type' => 'disqus',
           '#disqus' => $account->disqus,
           '#weight' => variable_get('disqus_weight', 50),
-          '#access' => user_access('view disqus comments'),
+          '#access' => Drupal::currentUser()->hasPermission('view disqus comments'),
         );
         break;
     }
@@ -397,7 +397,7 @@ function disqus_form_alter(&$form, $form_state, $form_id) {
       if (!isset($form['comment_settings'])) {
         $form['comment_settings'] = array(
           '#type' => 'fieldset',
-          '#access' => user_access('toggle disqus comments'),
+          '#access' => Drupal::currentUser()->hasPermission('toggle disqus comments'),
           '#title' => t('Comment settings'),
           '#collapsible' => TRUE,
           '#collapsed' => TRUE,
@@ -410,7 +410,7 @@ function disqus_form_alter(&$form, $form_state, $form_id) {
           // Ensure only core Comment administrators see Comment module settings
           $form['comment_settings']['comment']['#access'] = $form['comment_settings']['#access'];
           // But reveal parent comment settings fieldset if user has toggle permission
-          $form['comment_settings']['#access'] = user_access('toggle disqus comments');
+          $form['comment_settings']['#access'] = Drupal::currentUser()->hasPermission('toggle disqus comments');
         }
       }
       // Add the Disqus settings into the comment settings fieldset for users with toggle permission.
@@ -419,7 +419,7 @@ function disqus_form_alter(&$form, $form_state, $form_id) {
         '#title' => t('Disqus comments'),
         '#description' => t('Users can post comments using <a href="@disqus">Disqus</a>.', array('@disqus' => 'http://disqus.com')),
         '#default_value' => isset($node->disqus['status']) ? $node->disqus['status'] : TRUE,
-        '#access' => user_access('toggle disqus comments'),
+        '#access' => Drupal::currentUser()->hasPermission('toggle disqus comments'),
       );
     }
   }

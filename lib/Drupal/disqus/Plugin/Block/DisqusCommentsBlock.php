@@ -52,7 +52,7 @@ class DisqusCommentsBlock extends DisqusBaseBlock {
   public function build() {
     $disqus_config = \Drupal::config('disqus.settings');
 
-    if ($disqus_config->get('visibility.disqus_location') === 'block' && user_access('view disqus comments')) {
+    if ($disqus_config->get('visibility.disqus_location') === 'block' && Drupal::currentUser()->hasPermission('view disqus comments')) {
       if ($object = menu_get_object()) {
         return $this->buildForNodeEntity($object);
       }

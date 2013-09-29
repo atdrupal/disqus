@@ -45,7 +45,7 @@ Drupal.behaviors.disqusSettingsForm = {
         }
       }
 
-      return vals.join('<br />');
+      return vals.join(', ');
     });
 
     $context.find('#edit-advanced').drupalSetSummary(function(context) {

@@ -129,14 +129,16 @@ abstract class DisqusBaseBlock extends BlockBase {
   }
 
   protected function getOptions() {
+    $disqus_config = \Drupal::config('disqus.settings');
+
     return array(
-      'num_items' => $this->configuration($delta . '_items', 5),
-      'avatars' => $this->configuration($delta . '_showavatars', TRUE) ? array('avatar_size' => $this->configuration($delta . '_avatarsize', 32)) : array('hide_avatars=1'),
-      'color' => $this->configuration($delta . '_colortheme', 'blue'),
-      'default_tab' => $this->configuration($delta . '_defaulttabview', 'people'),
-      'excerpt_length' => $this->configuration($delta . '_excerpt_length', '200'),
-      'hide_mods' => $this->configuration($delta . '_hide_mods', FALSE) ? '1' : '0',
-      'domain' => $this->configuration('disqus_domain', ''),
+      'num_items' => $this->configuration($this->id . '_items', 5),
+      'avatars' => $this->configuration($this->id . '_showavatars', TRUE) ? array('avatar_size' => $this->configuration($this->id . '_avatarsize', 32)) : array('hide_avatars=1'),
+      'color' => $this->configuration($this->id . '_colortheme', 'blue'),
+      'default_tab' => $this->configuration($this->id . '_defaulttabview', 'people'),
+      'excerpt_length' => $this->configuration($this->id . '_excerpt_length', '200'),
+      'hide_mods' => $this->configuration($this->id . '_hide_mods', FALSE) ? '1' : '0',
+      'domain' => $disqus_config->get('disqus_domain'),
     );
   }
 
@@ -151,7 +153,9 @@ abstract class DisqusBaseBlock extends BlockBase {
    * @return
    *   Render array that can be directly used for block content.
    */
-  function render($function, $options) {
+  function render($function) {
+    $options = $this->getOptions();
+
     $configuration = array(
       'recent_comments_widget' => array(
         'id' => 'dsq-recentcomments',

@@ -73,15 +73,10 @@ class DisqusCommentsBlock extends DisqusBaseBlock {
           'disqus' => array(
             '#type' => 'disqus',
             '#disqus' => $object->disqus,
-          ),
           '#cache' => array(
-            'bin' => 'cache_block',
-            'expire' => CACHE_TEMPORARY,
-            'keys' => array(
-              'disqus',
-              'disqus_comments',
-              'node',
-              (int) $object->nid,
+              'bin' => 'block',
+              'keys' => array('disqus', 'disqus_comments', 'node', $object->id()),
+              'tags' => array('content' => TRUE),
             ),
           ),
         );

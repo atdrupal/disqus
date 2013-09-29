@@ -187,14 +187,6 @@ function disqus_element_post_render($children, &$element) {
     $disqus['callbacks'] = $element['#disqus']['callbacks'];
   }
 
-  // Add the disqus.js and all the settings to process the JavaScript and load Disqus.
-  $element['#attached']['js'][] = drupal_get_path('module', 'disqus') . '/disqus.js';
-  $element['#attached']['js'][] = array(
-    'type' => 'setting',
-    'data' => array(
-      'disqus' => $disqus,
-    ),
-  );
   return $children;
 }
 
@@ -461,8 +453,18 @@ function disqus_theme() {
  */
 function theme_disqus_noscript($variables = array()) {
   $disqus = $variables['disqus'];
-  // Return the comment markup.
-  return '<noscript><p>' . l(t('View the discussion thread.'), 'http://' . $disqus['domain'] . '.disqus.com/?url=' . urlencode($disqus['url'])) . '</p></noscript>';
+
+  $return = array(
+    '#markup' => '<noscript><p>' . l(t('View the discussion thread.'), 'http://' . $disqus['domain'] . '.disqus.com/?url=' . urlencode($disqus['url'])) . '</p></noscript>',
+    '#attached' => array(
+      'js' => array(
+        drupal_get_path('module', 'disqus') . '/disqus.js',
+        array('type' => 'setting', 'data' => array('disqus' => $disqus))
+      )
+    )
+  );
+
+  return drupal_render($return);
 }
 
 /**

@@ -21,7 +21,7 @@ class DisqusCommentCount extends FieldPluginBase {
     // Ensure Disqus comments are available on the node user has access to edit this node.
     $node = node_load($values->nid);
 
-    if (!Drupal::currentUser()->hasPermission('view disqus comments') || isset($node->disqus)) {
+    if (!\Drupal::currentUser()->hasPermission('view disqus comments') || isset($node->disqus)) {
       return;
     }
 

@@ -7,28 +7,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DisqusSettingsForm extends ConfigFormBase {
   /**
-   * Constructs a SiteInformationForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\Context\ContextInterface $context
-   *   The configuration context used for this configuration object.
-   */
-  public function __construct(ConfigFactory $config_factory, ContextInterface $context) {
-    parent::__construct($config_factory, $context);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('config.context.free')
-    );
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function getFormID() {

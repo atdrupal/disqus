@@ -185,21 +185,13 @@ abstract class DisqusBaseBlock extends BlockBase {
       }
     }
 
+    $url = url("//disqus.com/forums/${options['domain']}/$function.js", array('external' => TRUE, 'query' => $query));
+
     return array(
       'widget' => array(
-        '#theme' => 'html_tag',
-        '#tag' => 'script',
+        '#prefix' => '<script type="text/javascript" src="'. $url .'">',
+        '#suffix' => '</script>',
         '#value' => '',
-        '#attributes' => array(
-          'type' => 'text/javascript',
-          'src' => url(
-            "//disqus.com/forums/${options['domain']}/$function.js",
-            array(
-              'external' => TRUE,
-              'query' => $query,
-            )
-          ),
-        ),
       ),
       '#theme_wrappers' => array('container'),
       '#attributes' => array(

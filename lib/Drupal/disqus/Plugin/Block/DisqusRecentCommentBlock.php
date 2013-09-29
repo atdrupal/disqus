@@ -22,7 +22,7 @@ class DisqusRecentCommentBlock extends DisqusBaseBlock {
   public function build() {
     return array(
       '#title' => t('Recent Comments'),
-      $this->render('recent_comments_widget')
+      $this->render('recent_comments_widget'),
     );
   }
 }

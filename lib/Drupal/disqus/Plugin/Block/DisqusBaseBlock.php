@@ -181,7 +181,7 @@ abstract class DisqusBaseBlock extends BlockBase {
 
     $query = array();
     foreach ($configuration[$function]['query_items'] as $query_item) {
-      if ($query_item == 'avatars') {
+      if ($query_item === 'avatars') {
         $query += $options[$query_item];
       }
       else {

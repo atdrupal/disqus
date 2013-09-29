@@ -122,7 +122,7 @@ abstract class DisqusBaseBlock extends BlockBase {
    */
   public function blockSubmit($form, &$form_state) {
     foreach ($form_state['values']['disqus'] as $k => $v) {
-      if ($form['disqus'][$K]['#access']) {
+      if ($form['settings']['disqus'][$k]['#access']) {
         $this->configuration[$k] = $v;
       }
     }
